@@ -3,8 +3,13 @@ import { GoogleGenAI } from "@google/genai";
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const ai = new GoogleGenAI({ apiKey: GOOGLE_API_KEY });
 
-export async function POST(input: string) {
-    const req = `1. Follow these instructions to the absolute letter.
+export async function POST(request: Request) {
+    if (request.method !== "POST") {
+        return new Response("Method Not Allowed", { status: 405 });
+    }
+    const { input } = await request.json();
+    const req =
+        `1. Follow these instructions to the absolute letter.
 2. For the given food item, provide the following information in a consistent, structured format:
 - Label: A concise but specific, common name for the food.
 - Calories (kcal): An estimated calorie count for the specifies quantity, or if unspecified a standard serving size.
@@ -38,10 +43,13 @@ Food Item: ${input}`;
         });
 
         // Extract text from response
-        const data = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-        const output = JSON.parse(data);
-        // console.log(output);
-        return output;
+        const data: string = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+        // success(data);
+        return new Response(JSON.stringify(JSON.parse(data)), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+        });
+
     } catch (error) {
         console.error("Error generating content:", error);
         console.log("Trying alternative model...");
@@ -61,13 +69,36 @@ Food Item: ${input}`;
             });
 
             // Extract text from response
-            const data = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-            const output = JSON.parse(data);
-            // console.log(output);
-            return output;
+            const data: string = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+            // success(data);
+            return new Response(JSON.stringify(JSON.parse(data)), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+            });
+
         } catch (error) {
+            // failure(error)
             console.error("Error generating content:", error);
-            return "{ error }";
+            return new Response("{ error }", {
+                status: 500,
+                headers: { "Content-Type": "application/json" },
+            });
         }
     }
 }
+
+// Functions to handle success and failure responses
+// function success(data: string) {
+
+//     return new Response(JSON.stringify(JSON.parse(data)), {
+//         status: 200,
+//         headers: { "Content-Type": "application/json" },
+//     });
+// }
+// function failure(error: unknown) {
+//     console.error("Error generating content:", error);
+//     return new Response("{ error }", {
+//         status: 500,
+//         headers: { "Content-Type": "application/json" },
+//     });
+// }

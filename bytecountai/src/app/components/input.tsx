@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { POST } from "../ai/route";
+// import { POST } from "../api/post";
 import { z } from "zod";
 
 import Spinner from "./utilities/spinner";
@@ -39,7 +39,6 @@ export default function Input() {
     useEffect(() => {
         const calculatedTotal = mealPad.reduce((acc, item) => acc + item.calories, 0);
         setTotal(calculatedTotal);
-        // console.log("Total calories:", calculatedTotal);
     }, [mealPad]);
     // Here the dependency array is mealPad, so the effect will run whenever mealPad changes.
 
@@ -57,9 +56,17 @@ export default function Input() {
         inputElement!.value = "";
 
         // Fetch the response from the POST function
-        let response: any;
+        let data: unknown;
         try {
-            response = await POST(inputValue);
+            const response = await fetch("api/ai", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ input: inputValue }),
+            })
+            data = await response.json();
+
         } catch (error) {
             console.error("Error generating content:", error);
             alert(`There was an error - please try again.`);
@@ -68,10 +75,10 @@ export default function Input() {
             // TODO: Centralise client-side error handling
         }
         finally {
-            setIsLoading(false); // End loading state and proceed with the rest of the cod
+            setIsLoading(false); // End loading state and proceed with the rest of the code
 
             // Check if the response is an error, invalid or empty, or type it accordingly
-            const responseAsString: string = JSON.stringify(response);
+            const responseAsString: string = JSON.stringify(data);
             if (responseAsString.includes("{ invalid }")) {
                 inputElement!.value = "";
                 alert(`The supplied input is not food!`); // A problem with the user being a sicko
@@ -84,15 +91,15 @@ export default function Input() {
                 return;
             }
             // Validate the response type with Zod
-            if (!Fooditem.safeParse(response).success) {
-                console.error("Invalid response format:", response);
+            if (!Fooditem.safeParse(data).success) {
+                console.error("Invalid response format:", data);
                 alert(`There was an error - please contact the admin.`); // A problem with the prompt
                 inputElement!.value = foodString;
                 return;
             }
 
             // Cast it to Fooditem
-            const validResponse = response as Fooditem;
+            const validResponse = data as Fooditem;
 
             // Update the mealPad state with the new food item
             const mealPadWithNewItem = [...mealPad, validResponse];
