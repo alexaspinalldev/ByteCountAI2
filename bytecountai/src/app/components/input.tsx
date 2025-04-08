@@ -69,7 +69,7 @@ export default function Input() {
 
         } catch (error) {
             console.error("Error generating content:", error);
-            alert(`There was an error - please try again.`);
+            alert(`There was a network error - please try again.`);
             inputElement!.value = foodString;
             return;
             // TODO: Centralise client-side error handling
@@ -79,21 +79,21 @@ export default function Input() {
 
             // Check if the response is an error, invalid or empty, or type it accordingly
             const responseAsString: string = JSON.stringify(data);
-            if (responseAsString.includes("{ invalid }")) {
+            if (responseAsString.includes("invalid")) {
                 inputElement!.value = "";
                 alert(`The supplied input is not food!`); // A problem with the user being a sicko
                 return;
                 // TODO: Centralise client-side error handling
             }
-            if (responseAsString.includes("{ error }") || responseAsString === "") {
-                alert(`There was an error - please try again.`); // Some other AI call error
+            if (responseAsString.includes("error") || responseAsString === "") {
+                alert(`There was an undefined network error - please try again.`); // Some other AI call error
                 inputElement!.value = foodString;
                 return;
             }
             // Validate the response type with Zod
             if (!Fooditem.safeParse(data).success) {
                 console.error("Invalid response format:", data);
-                alert(`There was an error - please contact the admin.`); // A problem with the prompt
+                alert(`There was an AI error - please contact the admin.`); // A problem with the prompt
                 inputElement!.value = foodString;
                 return;
             }

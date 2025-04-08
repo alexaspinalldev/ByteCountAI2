@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     --   ~0.5 indicates a vague description with quantity (e.g., '100g chicken' or '1 slice of bread').
     --   ~0.1 indicates a vague description with no quantity or brand (e.g., 'Chicken' or "Bread)
     --   0 indicates a result that is totally impossible to analyse (e.g., 'Food').
-4. Return "{ invalid }" for non-foodstuff.
+4. Return "{"invalid: invalid"}" for non-foodstuff.
 5. Do not include any additional text or explanations in the response, and do not add styling or markdown to the response.
 6. Use the following JSON format for the response. Note label is a string, calories is an integer, and certainty is a decimal:
 "{"label": "[Label]", "calories": [Calories], "certainty": [Certainty Score]}"
@@ -45,6 +45,7 @@ Food Item: ${input}`;
         // Extract text from response
         const data: string = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
         // success(data);
+        console.log("Response data:", data);
         return new Response(JSON.stringify(JSON.parse(data)), {
             status: 200,
             headers: { "Content-Type": "application/json" },
@@ -79,7 +80,7 @@ Food Item: ${input}`;
         } catch (error) {
             // failure(error)
             console.error("Error generating content:", error);
-            return new Response("{ error }", {
+            return new Response(`{"error": "error"}`, {
                 status: 500,
                 headers: { "Content-Type": "application/json" },
             });
