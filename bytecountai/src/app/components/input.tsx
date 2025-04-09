@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 // import { POST } from "../api/post";
 import { z } from "zod";
 
+import { postMeal } from "../../db/index"; // TODO: Move to api route?
+
 import Spinner from "./utilities/spinner";
 import Button from "./utilities/button";
 
@@ -186,17 +188,24 @@ export default function Input() {
         localStorage.setItem("mealPad", JSON.stringify(mealPad));
     }
 
-    // TODO: Post to day of eating/DB
-    // const mealCommit = {
-    // mealLabel: meallabel,
-    // userId: userId,
-    // date: date,
-    // mealContent: mealPad };
+    // * Post to day of eating/DB
+    const mealBody = JSON.stringify(mealPad);
+    const totalCalories = total;
+    const label = "Meal " // TODO: Allow use to name the meal
+    async function commitMeal() {
+        try {
+            const mealId = await postMeal(totalCalories, label, mealBody);
+            console.log("Meal posted successfully:", mealId);
+            alert("Meal saved successfully!");
+            setMealPadAndSync([]);
+            localStorage.removeItem("mealPad");
+            // Need to think about optimistically updating the UI too
 
-    // Post this to my server component
-    // setMealPadAndSync([]]);
-    // The server component will then post this to the DB
-    // If the DB post fails, return the mealPad, local storage and DOM to its previous state
+        } catch (error) {
+            console.error("Error posting meal:", error);
+            alert("There was an error saving the meal. Please try again.");
+        }
+    }
 
 
     return (
@@ -260,7 +269,7 @@ export default function Input() {
                 }
             </ul >
             <div className="flex justify-between p-2">
-                <Button>Commit to day</Button>
+                <Button onClick={commitMeal}>Commit to day</Button>
                 <div>Total: {total}</div>
             </div>
         </div >
