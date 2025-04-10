@@ -201,8 +201,8 @@ export default function Input() {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             } else {
-                alert("Meal saved successfully!");
                 setMealPadAndSync([]);
+                alert("Meal saved successfully!");
                 // TODO: Need to think about optimistically updating the UI too
             }
         } catch (error) {

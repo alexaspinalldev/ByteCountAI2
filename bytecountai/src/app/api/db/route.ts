@@ -9,6 +9,7 @@ type MealSchema = typeof meals.$inferInsert;
 
 // * Functions
 // * Function to commit a meal to the database
+// TODO: convert to handler
 export async function POST(Req: Request) {
     // Parse the request body
     const { mealBody, totalCalories, label, userId } = await Req.json();
