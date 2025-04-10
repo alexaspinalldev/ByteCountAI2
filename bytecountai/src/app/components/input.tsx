@@ -214,6 +214,7 @@ export default function Input() {
 
     return (
         <div className="flex flex-col w-full p-2">
+            <h1 className="text-2xl text-highlight font-bold p-2">Meal input</h1>
             <input className="w-full p-2 mb-2 text-gray-800 bg-gray-400 rounded-lg"
                 // TODO: Add ternary for className for loading state (disabled: psuedoselector doesn't work)
                 {...isLoading ? { placeholder: "Fetching..." } : { placeholder: "Enter food item" }}

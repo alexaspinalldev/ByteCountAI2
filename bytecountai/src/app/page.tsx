@@ -2,7 +2,7 @@ import Input from "./components/input";
 
 export default function Home() {
   return (
-    <main className="flex items-center justify-center w-full h-screen bg-[#1B2A1E] text-white flex-wrap">
+    <main className="flex items-center justify-center w-full h-screen bg-background text-white flex-wrap">
       <div className="flex flex-wrap w-full md:w-1/2 border-2 border-gray-300 rounded-2xl">
         <Input />
       </div>
