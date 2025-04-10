@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 // import { POST } from "../api/post";
 import { z } from "zod";
 
-import { postMeal } from "../../db/index"; // TODO: Move to api route?
-
 import Spinner from "./utilities/spinner";
 import Button from "./utilities/button";
 
@@ -74,7 +72,6 @@ export default function Input() {
             alert(`There was a network error - please try again.`);
             inputElement!.value = foodString;
             return;
-            // TODO: Centralise client-side error handling
         }
         finally {
             setIsLoading(false); // End loading state and proceed with the rest of the code
@@ -85,7 +82,6 @@ export default function Input() {
                 inputElement!.value = "";
                 alert(`The supplied input is not food!`); // A problem with the user being a sicko
                 return;
-                // TODO: Centralise client-side error handling
             }
             if (responseAsString.includes("error") || responseAsString === "") {
                 alert(`There was an undefined network error - please try again.`); // Some other AI call error
@@ -191,16 +187,24 @@ export default function Input() {
     // * Post to day of eating/DB
     const mealBody = JSON.stringify(mealPad);
     const totalCalories = total;
-    const label = "Meal " // TODO: Allow use to name the meal
+    const label = "Meal" // TODO: Allow user to name the meal
+    const userId = 1; // TODO: Get the user ID from the session
     async function commitMeal() {
         try {
-            const mealId = await postMeal(totalCalories, label, mealBody);
-            console.log("Meal posted successfully:", mealId);
-            alert("Meal saved successfully!");
-            setMealPadAndSync([]);
-            localStorage.removeItem("mealPad");
-            // Need to think about optimistically updating the UI too
-
+            const response = await fetch("api/db", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ totalCalories, label, mealBody, userId }),
+            })
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            } else {
+                alert("Meal saved successfully!");
+                setMealPadAndSync([]);
+                // TODO: Need to think about optimistically updating the UI too
+            }
         } catch (error) {
             console.error("Error posting meal:", error);
             alert("There was an error saving the meal. Please try again.");

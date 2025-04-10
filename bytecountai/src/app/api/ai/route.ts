@@ -45,7 +45,7 @@ Food Item: ${input}`;
         // Extract text from response
         const data: string = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
         // success(data);
-        console.log("Response data:", data);
+        // console.log("Response data:", data);
         return new Response(JSON.stringify(JSON.parse(data)), {
             status: 200,
             headers: { "Content-Type": "application/json" },
