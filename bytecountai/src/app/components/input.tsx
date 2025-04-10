@@ -102,6 +102,7 @@ export default function Input() {
             // Update the mealPad state with the new food item
             const mealPadWithNewItem = [...mealPad, validResponse];
             setMealPadAndSync(mealPadWithNewItem);
+            inputElement!.focus();
         }
     }
 
@@ -213,7 +214,7 @@ export default function Input() {
 
 
     return (
-        <div className="flex flex-col w-full p-2">
+        <div className="flex flex-col p-2 w-full md:w-[45%] border-1 border-gray-400 rounded-2xl max-h-[50%] md:max-h-full">
             <h1 className="text-2xl text-highlight font-bold p-2">Meal input</h1>
             <input className="w-full p-2 mb-2 text-gray-800 bg-gray-400 rounded-lg"
                 // TODO: Add ternary for className for loading state (disabled: psuedoselector doesn't work)
@@ -244,11 +245,10 @@ export default function Input() {
             />
             <div className="flex gap-0">
                 <Button className="grow" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : "Add"}</Button>
-                <Button className="grow" onClick={clearMealPad}>Clear all</Button>
             </div>
-            <ul id="mealPadUl" className="px-2">
+            <ul id="mealPadUl" className="px-2 overflow-scroll bg-[#002002]">
                 {mealPad.map((item, index) => (
-                    <li key={index} className="flex items-center justify-between p-2 border-b-2 border-gray-300">
+                    <li key={index} className="flex items-center justify-between py-2 border-b-1 border-gray-500">
                         <div className="flex justify-between grow">
                             <div onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodName" className="grow">{item.label}</div>
                             <div className="flex">
@@ -273,8 +273,11 @@ export default function Input() {
                 ))
                 }
             </ul >
-            <div className="flex justify-between p-2">
-                <Button onClick={commitMeal}>Commit to day</Button>
+            <div className="flex justify-between p-2 items-center">
+                <div className="flex gap-2">
+                    <Button onClick={commitMeal}>Commit to day</Button>
+                    <Button className="" onClick={clearMealPad}>Clear all</Button>
+                </div>
                 <div>Total: {total}</div>
             </div>
         </div >
