@@ -25,12 +25,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <title>{String(metadata.title)}</title>
       </head>
       <body
-        className={"flex flex-col items-center justify-center h-screen"}
+        className={"h-lvh"}
       >
         {children}
-        <footer className="mt-auto">
-          Alex has a great footer
-        </footer>
       </body>
     </html>
   );

@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-// import { POST } from "../api/post";
 import { z } from "zod";
 
 import Spinner from "./utilities/spinner";
 import Button from "./utilities/button";
+
+import { Input } from "@/components/ui/input"
+
 
 // Zod schema for Fooditem
 const Fooditem = z.object({
@@ -17,7 +19,7 @@ const Fooditem = z.object({
 type Fooditem = z.infer<typeof Fooditem>;
 
 // * Input component
-export default function Input() {
+export default function mealInput() {
     const [foodString, setFoodString] = useState("");
     const [mealPad, setMealPad] = useState<Fooditem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -216,9 +218,10 @@ export default function Input() {
 
 
     return (
-        <section className="flex flex-col p-2 w-full md:w-[45%] border-1 border-gray-400 rounded-2xl max-h-[50%] md:max-h-full">
+        <section className="flex flex-col p-2 w-full h-full border-1 border-gray-400 rounded-2xl">
             <h1 className="text-2xl text-highlight font-bold p-2">Meal input</h1>
-            <input className="w-full p-2 mb-2 text-gray-800 bg-gray-400 rounded-lg"
+            <Input
+                className="mb-2"
                 // TODO: Add ternary for className for loading state (disabled: psuedoselector doesn't work)
                 {...isLoading ? { placeholder: "Fetching..." } : { placeholder: "Enter food item" }}
                 // onChange={(event) => setFoodString(event.target.value)}
