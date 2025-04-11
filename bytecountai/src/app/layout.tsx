@@ -25,7 +25,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <title>{String(metadata.title)}</title>
       </head>
       <body
-        className={"flex flex-col items-center justify-center min-h-screen"}
+        className={"flex flex-col items-center justify-center h-screen"}
       >
         {children}
         <footer className="mt-auto">

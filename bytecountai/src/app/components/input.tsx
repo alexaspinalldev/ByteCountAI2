@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 // import { POST } from "../api/post";
 import { z } from "zod";
 
@@ -35,7 +35,6 @@ export default function Input() {
 
     // * Calculate total calories on render
     const [total, setTotal] = useState(0);
-
     useEffect(() => {
         const calculatedTotal = mealPad.reduce((acc, item) => acc + item.calories, 0);
         setTotal(calculatedTotal);
@@ -44,7 +43,7 @@ export default function Input() {
 
     // * Functions
     // * Send an item to the AI to test
-    async function testInput() {
+    const testInput = useCallback(async () => {
         const inputElement = document.getElementById("foodInput") as HTMLInputElement | null;
         if (inputElement!.value === "") {
             return;
@@ -104,11 +103,11 @@ export default function Input() {
             setMealPadAndSync(mealPadWithNewItem);
             inputElement!.focus();
         }
-    }
+    }, []);
 
     // * Edit item in the mealPad
     // Make the item editable on click
-    async function editItem(event: React.MouseEvent<HTMLDivElement>, index: number) {
+    const editItem = useCallback(async (event: React.MouseEvent<HTMLDivElement>, index: number) => {
         // Prevent the click event from bubbling up to the li element
         event.stopPropagation();
         const div = event.target as HTMLLIElement;
@@ -164,33 +163,36 @@ export default function Input() {
             }
         }
         );
-    }
+    }, []);
 
 
     // * Clear entire mealPad
-    async function clearMealPad() {
-        alert("Are you sure you want to clear all items?");
+    const clearMealPad = useCallback(async () => {
+        alert("Are you sure you want to clear the meal?");
         setMealPadAndSync([]);
-    }
+    }, [])
 
 
     // * Delete items from mealPad
-    async function removeItem(itemId: number, prevMealPad: Fooditem[] = mealPad) {
-        setMealPadAndSync(prevMealPad.filter((_: Fooditem, index: number) => index !== itemId))
-    }
+    // Use useCallback to memoize the function. The empty array means it will only be created once and is not called on every render
+    // This is important for performance and to avoid unnecessary re-renders
+    const removeItem = useCallback(async (itemId: number, prevMealPad: Fooditem[] = mealPad) => {
+        setMealPadAndSync(prevMealPad.filter((_: Fooditem, index: number) => index !== itemId));
+    }, []);
+
 
     // * Update the mealPad state and sync with local storage
-    function setMealPadAndSync(mealPad: Fooditem[]) {
+    const setMealPadAndSync = useCallback(async (mealPad: Fooditem[]) => {
         setMealPad(mealPad);
         localStorage.setItem("mealPad", JSON.stringify(mealPad));
-    }
+    }, []);
 
     // * Post to day of eating/DB
     const mealBody = JSON.stringify(mealPad);
     const totalCalories = total;
     const label = "Meal" // TODO: Allow user to name the meal
     const userId = 1; // TODO: Get the user ID from the session
-    async function commitMeal() {
+    const commitMeal = useCallback(async () => {
         try {
             const response = await fetch("api/db", {
                 method: "POST",
@@ -210,11 +212,11 @@ export default function Input() {
             console.error("Error posting meal:", error);
             alert("There was an error saving the meal. Please try again.");
         }
-    }
+    }, []);
 
 
     return (
-        <div className="flex flex-col p-2 w-full md:w-[45%] border-1 border-gray-400 rounded-2xl max-h-[50%] md:max-h-full">
+        <section className="flex flex-col p-2 w-full md:w-[45%] border-1 border-gray-400 rounded-2xl max-h-[50%] md:max-h-full">
             <h1 className="text-2xl text-highlight font-bold p-2">Meal input</h1>
             <input className="w-full p-2 mb-2 text-gray-800 bg-gray-400 rounded-lg"
                 // TODO: Add ternary for className for loading state (disabled: psuedoselector doesn't work)
@@ -246,9 +248,9 @@ export default function Input() {
             <div className="flex gap-0">
                 <Button className="grow" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : "Add"}</Button>
             </div>
-            <ul id="mealPadUl" className="px-2 overflow-scroll bg-[#002002]">
+            <ul id="mealPadUl" className="px-2 overflow-scroll bg-[#002002] rounded-2xl my-2">
                 {mealPad.map((item, index) => (
-                    <li key={index} className="flex items-center justify-between py-2 border-b-1 border-gray-500">
+                    <li key={index} className="flex items-center justify-between pb-2 border-b-1 border-gray-500 mb-2">
                         <div className="flex justify-between grow">
                             <div onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodName" className="grow">{item.label}</div>
                             <div className="flex">
@@ -280,6 +282,6 @@ export default function Input() {
                 </div>
                 <div>Total: {total}</div>
             </div>
-        </div >
+        </section >
     );
 }

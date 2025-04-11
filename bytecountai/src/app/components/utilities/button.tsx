@@ -8,7 +8,7 @@ type ButtonProps = {
 }
 
 const Button: React.FC<ButtonProps> = ({ onClick, children, className }) => {
-    const baseClasses = "p-2 border-1 border-gray-400 cursor-pointer rounded-xl";
+    const baseClasses = "px-2 py-1 border-1 border-gray-400 cursor-pointer rounded-xl";
     return (
         <button onClick={onClick} className={baseClasses + " " + className} type="button">
             {children}
