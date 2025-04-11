@@ -274,7 +274,8 @@ export default function mealInput() {
                 <Button className="grow mb-2" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : "Add"}</Button>
             </div>
             <div className="grow" id="scrollAreaContainer">
-                <ScrollArea id="mealPadUl" className="py-2 bg-gray-100" style={{ height: `${scrollAreaHeight}px` }}>
+                {/* ^Used to explicity set the heght of the ScrollArea */}
+                <ScrollArea id="mealPadUl" className="py-2 bg-gray-100 dark:bg-gray-900" style={{ height: `${scrollAreaHeight}px` }}>
                     <Table>
                         <TableBody>
                             {mealPad.map((item, index) => (
