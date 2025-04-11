@@ -1,5 +1,6 @@
 "use client";
 
+// Imports
 import { useState, useEffect, useCallback } from "react";
 import { z } from "zod";
 
@@ -16,7 +17,9 @@ import {
     TableRow,
 } from "@/components/ui/table"
 
+import { Sparkles } from 'lucide-react';
 
+// ----------------------------------------------------------------
 
 // Zod schema for Fooditem
 const Fooditem = z.object({
@@ -244,7 +247,6 @@ export default function mealInput() {
             <Label htmlFor="foodInput" className="text-2xl text-highlight font-bold p-2">Meal input</Label>
             <Input
                 className="mb-2"
-                // TODO: Add ternary for className for loading state (disabled: psuedoselector doesn't work)
                 {...isLoading ? { placeholder: "Fetching..." } : { placeholder: "Enter food item" }}
                 // onChange={(event) => setFoodString(event.target.value)}
                 onKeyDown={(event) => {
@@ -271,7 +273,7 @@ export default function mealInput() {
                 disabled={isLoading}
             />
             <div className="flex gap-0">
-                <Button className="grow mb-2" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : "Add"}</Button>
+                <Button className="grow mb-2" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : <>Add <Sparkles /></>}</Button>
             </div>
             <div className="grow" id="scrollAreaContainer">
                 {/* ^Used to explicity set the heght of the ScrollArea */}
