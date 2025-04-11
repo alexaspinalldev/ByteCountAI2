@@ -10,7 +10,7 @@ export default function Home() {
       </div>
       <div className="h-1/2 w-full md:h-full md:w-1/2">
         <section className="flex flex-col p-2 w-full h-full border-1 border-gray-400 rounded-2xl">
-          <h1 className="text-2xl text-highlight font-bold p-2">Your day</h1>
+          <h1 className="text-2xl text-highlight font-bold p-2">Your day (Date picker here)</h1>
           <h2>Calories</h2>
           <h3>Goal: 2000</h3>
           <h3>Consumed: 1500</h3>

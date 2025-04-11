@@ -4,9 +4,18 @@ import { useState, useEffect, useCallback } from "react";
 import { z } from "zod";
 
 import Spinner from "./utilities/spinner";
-import Button from "./utilities/button";
 
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableRow,
+} from "@/components/ui/table"
+
 
 
 // Zod schema for Fooditem
@@ -162,8 +171,7 @@ export default function mealInput() {
                 event.preventDefault();
                 handleBlur();
             }
-        }
-        );
+        });
     };
 
 
@@ -218,7 +226,7 @@ export default function mealInput() {
 
     return (
         <section className="flex flex-col p-2 w-full h-full border-1 border-gray-400 rounded-2xl">
-            <h1 className="text-2xl text-highlight font-bold p-2">Meal input</h1>
+            <Label htmlFor="foodInput" className="text-2xl text-highlight font-bold p-2">Meal input</Label>
             <Input
                 className="mb-2"
                 // TODO: Add ternary for className for loading state (disabled: psuedoselector doesn't work)
@@ -248,39 +256,42 @@ export default function mealInput() {
                 disabled={isLoading}
             />
             <div className="flex gap-0">
-                <Button className="grow" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : "Add"}</Button>
+                <Button className="grow mb-2" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : "Add"}</Button>
             </div>
-            <ul id="mealPadUl" className="px-2 overflow-scroll rounded-2xl my-2">
-                {mealPad.map((item, index) => (
-                    <li key={index} className="flex items-center justify-between pb-2 border-b-1 border-gray-500 mb-2">
-                        <div className="flex justify-between grow">
-                            <div onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodName" className="grow">{item.label}</div>
-                            <div className="flex">
-                                <div onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodCal">{item.calories}</div>
-                                <div className="text-sm">&nbsp;kcal</div>
-                            </div>
-                        </div>
-                        <div className="relative group">
-                            <div className="w-[2rem]">
-                                <div className={item.certainty === -1 ? "hidden" :
-                                    item.certainty <= 0.4 ? "text-red-500" :
-                                        item.certainty > 0.4 && item.certainty <= 0.7 ? "text-yellow-500" :
-                                            "text-green-500"}>
-                                    <svg height={32} width={32} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g strokeWidth="0"></g><g strokeLinecap="round" strokeLinejoin="round"></g><g> <path d="M12 9.5C13.3807 9.5 14.5 10.6193 14.5 12C14.5 13.3807 13.3807 14.5 12 14.5C10.6193 14.5 9.5 13.3807 9.5 12C9.5 10.6193 10.6193 9.5 12 9.5Z" fill="currentColor"></path> </g></svg>
-                                </div>
-                            </div>
-                            <div className="absolute w-[200px] hidden p-1 text-center bg-gray-400 rounded-full text-md top-2 group-hover:block">{item.certainty < 0.4 ? "Adding weight/quantity, brand or preparation method can improve accuracy " : "Certainty: " + item.certainty}
-                            </div>
-                        </div>
-                        <Button onClick={() => removeItem(index)}>Remove</Button>
-                    </li>
-                ))
-                }
-            </ul >
-            <div className="flex justify-between p-2 items-center">
+            <ScrollArea id="mealPadUl" className="h-52 py-2 bg-gray-100">
+                {/* Need to somehow set an explicit height for the scroll area */}
+                <Table>
+                    <TableBody>
+                        {mealPad.map((item, index) => (
+                            <TableRow key={index} className="flex items-center">
+                                <TableCell onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodName" className="grow">{item.label}</TableCell>
+                                <TableCell className="flex items-center">
+                                    <div onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodCal">{item.calories}</div>
+                                    <div className="text-sm">&nbsp;kcal</div>
+                                </TableCell>
+                                <TableCell className="relative group px-0">
+                                    <div className="w-[2rem]">
+                                        <div className={item.certainty === -1 ? "hidden" :
+                                            item.certainty <= 0.4 ? "text-red-500" :
+                                                item.certainty > 0.4 && item.certainty <= 0.7 ? "text-yellow-500" :
+                                                    "text-green-500"}>
+                                            <svg height={32} width={32} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g strokeWidth="0"></g><g strokeLinecap="round" strokeLinejoin="round"></g><g> <path d="M12 9.5C13.3807 9.5 14.5 10.6193 14.5 12C14.5 13.3807 13.3807 14.5 12 14.5C10.6193 14.5 9.5 13.3807 9.5 12C9.5 10.6193 10.6193 9.5 12 9.5Z" fill="currentColor"></path> </g></svg>
+                                        </div>
+                                    </div>
+                                    {/* Certainty hint/tooltip */}
+                                    <div className="absolute w-[200px] hidden p-1 text-center bg-gray-400 rounded-full text-md top-2 group-hover:block">{item.certainty < 0.4 ? "Adding weight/quantity, brand or preparation method can improve accuracy " : "Certainty: " + item.certainty}</div>
+                                </TableCell>
+                                <TableCell><Button size="sm" variant="outline" onClick={() => removeItem(index)}>Remove</Button></TableCell>
+                            </TableRow>
+                        ))
+                        }
+                    </TableBody>
+                </Table>
+            </ScrollArea >
+            <div className="flex justify-between py-2 items-center mt-auto">
                 <div className="flex gap-2">
                     <Button onClick={commitMeal}>Commit to day</Button>
-                    <Button className="" onClick={clearMealPad}>Clear all</Button>
+                    <Button variant="outline" onClick={clearMealPad}>Clear all</Button>
                 </div>
                 <div>Total: {total}</div>
             </div>
