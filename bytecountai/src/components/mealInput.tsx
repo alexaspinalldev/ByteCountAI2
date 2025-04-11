@@ -223,6 +223,21 @@ export default function mealInput() {
         }
     };
 
+    // * Set the height of the scroll area on window resize or mount
+    const [scrollAreaHeight, setScrollAreaHeight] = useState(0);
+    useEffect(() => {
+        const updateHeight = () => {
+            const container = document.getElementById("scrollAreaContainer");
+            setScrollAreaHeight(container!.clientHeight);
+        };
+
+        // Set initial height
+        updateHeight();
+        // Update height on window resize
+        window.addEventListener("resize", updateHeight);
+        // Cleanup event listener on unmount
+        return () => window.removeEventListener("resize", updateHeight);
+    }, []);
 
     return (
         <section className="flex flex-col p-2 w-full h-full border-1 border-gray-400 rounded-2xl">
@@ -258,36 +273,37 @@ export default function mealInput() {
             <div className="flex gap-0">
                 <Button className="grow mb-2" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : "Add"}</Button>
             </div>
-            <ScrollArea id="mealPadUl" className="h-52 py-2 bg-gray-100">
-                {/* Need to somehow set an explicit height for the scroll area */}
-                <Table>
-                    <TableBody>
-                        {mealPad.map((item, index) => (
-                            <TableRow key={index} className="flex items-center">
-                                <TableCell onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodName" className="grow">{item.label}</TableCell>
-                                <TableCell className="flex items-center">
-                                    <div onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodCal">{item.calories}</div>
-                                    <div className="text-sm">&nbsp;kcal</div>
-                                </TableCell>
-                                <TableCell className="relative group px-0">
-                                    <div className="w-[2rem]">
-                                        <div className={item.certainty === -1 ? "hidden" :
-                                            item.certainty <= 0.4 ? "text-red-500" :
-                                                item.certainty > 0.4 && item.certainty <= 0.7 ? "text-yellow-500" :
-                                                    "text-green-500"}>
-                                            <svg height={32} width={32} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g strokeWidth="0"></g><g strokeLinecap="round" strokeLinejoin="round"></g><g> <path d="M12 9.5C13.3807 9.5 14.5 10.6193 14.5 12C14.5 13.3807 13.3807 14.5 12 14.5C10.6193 14.5 9.5 13.3807 9.5 12C9.5 10.6193 10.6193 9.5 12 9.5Z" fill="currentColor"></path> </g></svg>
+            <div className="grow" id="scrollAreaContainer">
+                <ScrollArea id="mealPadUl" className="py-2 bg-gray-100" style={{ height: `${scrollAreaHeight}px` }}>
+                    <Table>
+                        <TableBody>
+                            {mealPad.map((item, index) => (
+                                <TableRow key={index} className="flex items-center">
+                                    <TableCell onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodName" className="grow">{item.label}</TableCell>
+                                    <TableCell className="flex items-center">
+                                        <div onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodCal">{item.calories}</div>
+                                        <div className="text-sm">&nbsp;kcal</div>
+                                    </TableCell>
+                                    <TableCell className="relative group px-0">
+                                        <div className="w-[2rem]">
+                                            <div className={item.certainty === -1 ? "hidden" :
+                                                item.certainty <= 0.4 ? "text-red-500" :
+                                                    item.certainty > 0.4 && item.certainty <= 0.7 ? "text-yellow-500" :
+                                                        "text-green-500"}>
+                                                <svg height={32} width={32} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g strokeWidth="0"></g><g strokeLinecap="round" strokeLinejoin="round"></g><g> <path d="M12 9.5C13.3807 9.5 14.5 10.6193 14.5 12C14.5 13.3807 13.3807 14.5 12 14.5C10.6193 14.5 9.5 13.3807 9.5 12C9.5 10.6193 10.6193 9.5 12 9.5Z" fill="currentColor"></path> </g></svg>
+                                            </div>
                                         </div>
-                                    </div>
-                                    {/* Certainty hint/tooltip */}
-                                    <div className="absolute w-[200px] hidden p-1 text-center bg-gray-400 rounded-full text-md top-2 group-hover:block">{item.certainty < 0.4 ? "Adding weight/quantity, brand or preparation method can improve accuracy " : "Certainty: " + item.certainty}</div>
-                                </TableCell>
-                                <TableCell><Button size="sm" variant="outline" onClick={() => removeItem(index)}>Remove</Button></TableCell>
-                            </TableRow>
-                        ))
-                        }
-                    </TableBody>
-                </Table>
-            </ScrollArea >
+                                        {/* Certainty hint/tooltip */}
+                                        <div className="absolute w-[200px] hidden p-1 text-center bg-gray-400 rounded-full text-md top-2 group-hover:block">{item.certainty < 0.4 ? "Adding weight/quantity, brand or preparation method can improve accuracy " : "Certainty: " + item.certainty}</div>
+                                    </TableCell>
+                                    <TableCell><Button size="sm" variant="outline" onClick={() => removeItem(index)}>Remove</Button></TableCell>
+                                </TableRow>
+                            ))
+                            }
+                        </TableBody>
+                    </Table>
+                </ScrollArea >
+            </div>
             <div className="flex justify-between py-2 items-center mt-auto">
                 <div className="flex gap-2">
                     <Button onClick={commitMeal}>Commit to day</Button>
