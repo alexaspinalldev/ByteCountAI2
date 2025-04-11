@@ -45,7 +45,7 @@ export default function mealInput() {
 
     // * Functions
     // * Send an item to the AI to test
-    const testInput = useCallback(async () => {
+    async function testInput() {
         const inputElement = document.getElementById("foodInput") as HTMLInputElement | null;
         if (inputElement!.value === "") {
             return;
@@ -99,17 +99,16 @@ export default function mealInput() {
 
             // Cast it to Fooditem
             const validResponse = data as Fooditem;
-
             // Update the mealPad state with the new food item
             const mealPadWithNewItem = [...mealPad, validResponse];
             setMealPadAndSync(mealPadWithNewItem);
             inputElement!.focus();
         }
-    }, []);
+    };
 
     // * Edit item in the mealPad
     // Make the item editable on click
-    const editItem = useCallback(async (event: React.MouseEvent<HTMLDivElement>, index: number) => {
+    async function editItem(event: React.MouseEvent<HTMLDivElement>, index: number) {
         // Prevent the click event from bubbling up to the li element
         event.stopPropagation();
         const div = event.target as HTMLLIElement;
@@ -165,10 +164,13 @@ export default function mealInput() {
             }
         }
         );
-    }, []);
+    };
 
 
     // * Clear entire mealPad
+    // Use useCallback to memoize the function. The empty array means it will only be created once and is not called on every render
+    // This is important for performance and to avoid unnecessary re-renders
+    // There is no issue with accessing the state variable becaue it's not a dependency
     const clearMealPad = useCallback(async () => {
         alert("Are you sure you want to clear the meal?");
         setMealPadAndSync([]);
@@ -176,25 +178,22 @@ export default function mealInput() {
 
 
     // * Delete items from mealPad
-    // Use useCallback to memoize the function. The empty array means it will only be created once and is not called on every render
-    // This is important for performance and to avoid unnecessary re-renders
-    const removeItem = useCallback(async (itemId: number, prevMealPad: Fooditem[] = mealPad) => {
+    async function removeItem(itemId: number, prevMealPad: Fooditem[] = mealPad) {
         setMealPadAndSync(prevMealPad.filter((_: Fooditem, index: number) => index !== itemId));
-    }, []);
-
+    };
 
     // * Update the mealPad state and sync with local storage
-    const setMealPadAndSync = useCallback(async (mealPad: Fooditem[]) => {
+    async function setMealPadAndSync(mealPad: Fooditem[]) {
         setMealPad(mealPad);
         localStorage.setItem("mealPad", JSON.stringify(mealPad));
-    }, []);
+    };
 
     // * Post to day of eating/DB
     const mealBody = JSON.stringify(mealPad);
     const totalCalories = total;
     const label = "Meal" // TODO: Allow user to name the meal
     const userId = 1; // TODO: Get the user ID from the session
-    const commitMeal = useCallback(async () => {
+    async function commitMeal() {
         try {
             const response = await fetch("api/db", {
                 method: "POST",
@@ -214,7 +213,7 @@ export default function mealInput() {
             console.error("Error posting meal:", error);
             alert("There was an error saving the meal. Please try again.");
         }
-    }, []);
+    };
 
 
     return (
@@ -251,7 +250,7 @@ export default function mealInput() {
             <div className="flex gap-0">
                 <Button className="grow" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : "Add"}</Button>
             </div>
-            <ul id="mealPadUl" className="px-2 overflow-scroll bg-[#002002] rounded-2xl my-2">
+            <ul id="mealPadUl" className="px-2 overflow-scroll rounded-2xl my-2">
                 {mealPad.map((item, index) => (
                     <li key={index} className="flex items-center justify-between pb-2 border-b-1 border-gray-500 mb-2">
                         <div className="flex justify-between grow">
