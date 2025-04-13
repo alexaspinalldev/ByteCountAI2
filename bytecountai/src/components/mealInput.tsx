@@ -2,7 +2,7 @@
 
 // Imports
 import { useState, useEffect, useCallback } from "react";
-import { z } from "zod";
+import { set, z } from "zod";
 
 import Spinner from "./utilities/spinner";
 
@@ -231,16 +231,18 @@ export default function mealInput() {
     useEffect(() => {
         const updateHeight = () => {
             const container = document.getElementById("scrollAreaContainer");
-            setScrollAreaHeight(container!.clientHeight);
+            if (container) {
+                const newHeight = container.clientHeight;
+                setScrollAreaHeight(newHeight); // Update state with the new height
+            }
         };
-
         // Set initial height
         updateHeight();
         // Update height on window resize
         window.addEventListener("resize", updateHeight);
         // Cleanup event listener on unmount
         return () => window.removeEventListener("resize", updateHeight);
-    }, []);
+    }, []); // Dependency array ensures this effect runs only once
 
     return (
         <section className="flex flex-col p-2 w-full h-full border-1 border-gray-400 rounded-2xl">
@@ -277,7 +279,7 @@ export default function mealInput() {
             </div>
             <div className="grow" id="scrollAreaContainer">
                 {/* ^Used to explicity set the heght of the ScrollArea */}
-                <ScrollArea id="mealPadUl" className="py-2 bg-gray-100 dark:bg-gray-900" style={{ height: `${scrollAreaHeight}px` }}>
+                <ScrollArea id="mealPadUl" className="py-2 bg-gray-100 dark:bg-zinc-900" style={{ height: `${scrollAreaHeight}px` }}>
                     <Table>
                         <TableBody>
                             {mealPad.map((item, index) => (
