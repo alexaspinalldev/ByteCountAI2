@@ -1,5 +1,5 @@
-import Input from "../components/mealInput";
-import Header from "../components/header";
+import Input from "./components/features/mealInput";
+import Header from "./components/common/header";
 
 export default function Home() {
   return (

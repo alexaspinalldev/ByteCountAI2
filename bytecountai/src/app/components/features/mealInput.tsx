@@ -4,18 +4,18 @@
 import { useState, useEffect, useCallback } from "react";
 import { set, z } from "zod";
 
-import Spinner from "./utilities/spinner";
+import Spinner from "../common/ui/spinner";
 
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { Input } from "@/app/components/common/ui/input"
+import { Label } from "@/app/components/common/ui/label"
+import { Button } from "@/app/components/common/ui/button"
+import { ScrollArea } from "@/app/components/common/ui/scroll-area"
 import {
     Table,
     TableBody,
     TableCell,
     TableRow,
-} from "@/components/ui/table"
+} from "@/app/components/common/ui/table"
 
 import { Sparkles } from 'lucide-react';
 
@@ -244,9 +244,11 @@ export default function mealInput() {
         return () => window.removeEventListener("resize", updateHeight);
     }, []); // Dependency array ensures this effect runs only once
 
+    // TODO: I wonder if there is some circular logic here with the scrollarea resizing the container and the container resizing the scrollarea
+
     return (
-        <section className="flex flex-col p-2 w-full h-full border-1 border-gray-400 rounded-2xl">
-            <Label htmlFor="foodInput" className="text-2xl text-highlight font-bold p-2">Meal input</Label>
+        <section className="flex flex-col w-full h-full p-2 border-gray-400 border-1 rounded-2xl">
+            <Label htmlFor="foodInput" className="p-2 text-2xl font-bold text-highlight">Meal input</Label>
             <Input
                 className="mb-2"
                 {...isLoading ? { placeholder: "Fetching..." } : { placeholder: "Enter food item" }}
@@ -275,7 +277,7 @@ export default function mealInput() {
                 disabled={isLoading}
             />
             <div className="flex gap-0">
-                <Button className="grow mb-2" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : <>Add <Sparkles /></>}</Button>
+                <Button className="mb-2 grow" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : <>Add <Sparkles /></>}</Button>
             </div>
             <div className="grow" id="scrollAreaContainer">
                 {/* ^Used to explicity set the heght of the ScrollArea */}
@@ -289,7 +291,7 @@ export default function mealInput() {
                                         <div onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodCal">{item.calories}</div>
                                         <div className="text-sm">&nbsp;kcal</div>
                                     </TableCell>
-                                    <TableCell className="relative group px-0">
+                                    <TableCell className="relative px-0 group">
                                         <div className="w-[2rem]">
                                             <div className={item.certainty === -1 ? "hidden" :
                                                 item.certainty <= 0.4 ? "text-red-500" :
@@ -309,7 +311,7 @@ export default function mealInput() {
                     </Table>
                 </ScrollArea >
             </div>
-            <div className="flex justify-between py-2 items-center mt-auto">
+            <div className="flex items-center justify-between py-2 mt-auto">
                 <div className="flex gap-2">
                     <Button onClick={commitMeal}>Commit to day</Button>
                     <Button variant="outline" onClick={clearMealPad}>Clear all</Button>
