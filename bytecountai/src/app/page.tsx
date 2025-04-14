@@ -6,7 +6,6 @@ export default function Home() {
     <div className="flex flex-col h-full w-full">
       <Header />
       <main className="flex flex-col md:flex-row justify-center w-full grow gap-3 px-3 pb-3">
-        {/* Settings sidebar */}
         {/* Calendar sidebar */}
         <div className="grow w-full md:w-1/2">
           <Input />

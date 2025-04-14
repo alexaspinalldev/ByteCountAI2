@@ -11,6 +11,14 @@ import { Label } from "@/app/components/common/ui/label"
 import { Button } from "@/app/components/common/ui/button"
 import { ScrollArea } from "@/app/components/common/ui/scroll-area"
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/app/components/common/ui/select"
+
+import {
     Table,
     TableBody,
     TableCell,
@@ -139,7 +147,7 @@ export default function mealInput() {
             } else {
                 // Show warning if the user tries to enter a non-numeric value for calories
                 if (div.id === "foodCal" && isNaN(parseInt(div.textContent!))) {
-                    alert("Calories must be a number");
+                    alert(`Calories must be a number`);
                     div.textContent = oldValue;
                     return
                 }
@@ -183,9 +191,11 @@ export default function mealInput() {
     // This is important for performance and to avoid unnecessary re-renders
     // There is no issue with accessing the state variable becaue it's not a dependency
     const clearMealPad = useCallback(async () => {
-        alert("Are you sure you want to clear the meal?");
-        setMealPadAndSync([]);
-    }, [])
+        if (confirm(`Are you sure you want to clear the meal?`)) {
+            setMealPadAndSync([]);
+            localStorage.removeItem("mealPad");
+        }
+    }, []);
 
 
     // * Delete items from mealPad
@@ -202,9 +212,14 @@ export default function mealInput() {
     // * Post to day of eating/DB
     const mealBody = JSON.stringify(mealPad);
     const totalCalories = total;
-    const label = "Meal" // TODO: Allow user to name the meal
+    const labelInput = document.getElementById("mealLabel") as HTMLInputElement | null;
+    let label = labelInput?.value;
     const userId = 1; // TODO: Get the user ID from the session
     async function commitMeal() {
+        if (!label) {
+            alert(`Select which meal this was`);
+            return;
+        }
         try {
             const response = await fetch("api/db", {
                 method: "POST",
@@ -217,12 +232,12 @@ export default function mealInput() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             } else {
                 setMealPadAndSync([]);
-                alert("Meal saved successfully!");
+                alert(`Meal saved successfully!`);
                 // TODO: Need to think about optimistically updating the UI too
             }
         } catch (error) {
             console.error("Error posting meal:", error);
-            alert("There was an error saving the meal. Please try again.");
+            alert(`There was an error saving the meal. Please try again.`);
         }
     };
 
@@ -310,11 +325,25 @@ export default function mealInput() {
                         </TableBody>
                     </Table>
                 </ScrollArea >
+                <div className="flex justify-end py-2">
+                    <Button className="" variant="outline" onClick={clearMealPad}>Clear all</Button>
+                </div>
             </div>
             <div className="flex items-center justify-between py-2 mt-auto">
                 <div className="flex gap-2">
                     <Button onClick={commitMeal}>Commit to day</Button>
-                    <Button variant="outline" onClick={clearMealPad}>Clear all</Button>
+                    <Select>
+                        <SelectTrigger className="w-auto">
+                            <SelectValue placeholder="Meal" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="meal">Breakfast</SelectItem>
+                            <SelectItem value="lunch">Lunch</SelectItem>
+                            <SelectItem value="dinner">Dinner</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                            <SelectItem value="snack">Snack</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
                 <div>Total: {total}</div>
             </div>

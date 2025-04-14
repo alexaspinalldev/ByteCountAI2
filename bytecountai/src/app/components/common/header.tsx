@@ -19,7 +19,6 @@ export default function Header() {
         <SidebarCtx.Provider value={[sidebarOpen, setSidebarOpen]}>
             <header>
                 <div className="relative flex items-center justify-end w-full p-4 text-primary">
-                    {/* <h1 className="text-2xl font-bold">ByteCount</h1> */}
                     <button className="flex items-center space-x-4">
                         <CircleUserRound className="w-6 h-6" onClick={() => setSidebarOpen(prev => !prev)} />
                     </button>
