@@ -1,5 +1,7 @@
 import Input from "./components/features/mealInput";
+import DayTracker from "./components/features/dayTracker";
 import Header from "./components/common/header";
+
 
 export default function Home() {
   return (
@@ -11,20 +13,7 @@ export default function Home() {
           <Input />
         </div>
         <div className="grow w-full md:w-1/2">
-          <section className="flex flex-col p-2 w-full h-full border-1 border-gray-400 rounded-2xl">
-            <h1 className="text-2xl text-highlight font-bold p-2">Your day (Date picker here)</h1>
-            <h2>Calories</h2>
-            <h3>Goal: 2000</h3>
-            <h3>Consumed: 1500</h3>
-            <h3>Remaining: 500</h3>
-            <h2>Meals:</h2>
-            <ul>
-              <li>Breakfast</li>
-              <li>Lunch</li>
-              <li>Dinner</li>
-
-            </ul>
-          </section>
+          <DayTracker />
         </div>
       </main>
     </div>

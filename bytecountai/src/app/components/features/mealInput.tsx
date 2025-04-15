@@ -1,12 +1,12 @@
 "use client";
 
 // Imports
-import { useState, useEffect, useCallback } from "react";
-import { set, z } from "zod";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { z } from "zod";
 
 import Spinner from "../common/ui/spinner";
 
-import { Input } from "@/app/components/common/ui/input"
+import { Input } from "@/app/components/common/ui/input";
 import { Label } from "@/app/components/common/ui/label"
 import { Button } from "@/app/components/common/ui/button"
 import { ScrollArea } from "@/app/components/common/ui/scroll-area"
@@ -65,16 +65,16 @@ export default function mealInput() {
 
     // * Functions
     // * Send an item to the AI to test
+    const inputElement = useRef<HTMLInputElement | null>(null);
     async function testInput() {
-        const inputElement = document.getElementById("foodInput") as HTMLInputElement | null;
-        if (inputElement!.value === "") {
+        if (inputElement.current!.value === "") {
             return;
         }
 
         setIsLoading(true); // Start loading state
-        const inputValue: string = inputElement!.value;
+        const inputValue: string = inputElement.current!.value;
         setFoodString(inputValue);
-        inputElement!.value = "";
+        inputElement.current!.value = "";
 
         // Fetch the response from the POST function
         let data: unknown;
@@ -91,7 +91,7 @@ export default function mealInput() {
         } catch (error) {
             console.error("Error generating content:", error);
             alert(`There was a network error - please try again.`);
-            inputElement!.value = foodString;
+            inputElement.current!.value = foodString;
             return;
         }
         finally {
@@ -100,20 +100,20 @@ export default function mealInput() {
             // Check if the response is an error, invalid or empty, or type it accordingly
             const responseAsString: string = JSON.stringify(data);
             if (responseAsString.includes("invalid")) {
-                inputElement!.value = "";
+                inputElement.current!.value = "";
                 alert(`The supplied input is not food!`); // A problem with the user being a sicko
                 return;
             }
             if (responseAsString.includes("error") || responseAsString === "") {
                 alert(`There was an undefined network error - please try again.`); // Some other AI call error
-                inputElement!.value = foodString;
+                inputElement.current!.value = foodString;
                 return;
             }
             // Validate the response type with Zod
             if (!Fooditem.safeParse(data).success) {
                 console.error("Invalid response format:", data);
                 alert(`There was an AI error - please contact the admin.`); // A problem with the prompt
-                inputElement!.value = foodString;
+                inputElement.current!.value = foodString;
                 return;
             }
 
@@ -122,7 +122,7 @@ export default function mealInput() {
             // Update the mealPad state with the new food item
             const mealPadWithNewItem = [...mealPad, validResponse];
             setMealPadAndSync(mealPadWithNewItem);
-            inputElement!.focus();
+            inputElement.current!.focus();
         }
     };
 
@@ -212,8 +212,8 @@ export default function mealInput() {
     // * Post to day of eating/DB
     const mealBody = JSON.stringify(mealPad);
     const totalCalories = total;
-    const labelInput = document.getElementById("mealLabel") as HTMLInputElement | null;
-    let label = labelInput?.value;
+    const mealSelect = useRef<HTMLInputElement | null>(null);
+    let label = mealSelect.current?.value;
     const userId = 1; // TODO: Get the user ID from the session
     async function commitMeal() {
         if (!label) {
@@ -265,6 +265,7 @@ export default function mealInput() {
         <section className="flex flex-col w-full h-full p-2 border-gray-400 border-1 rounded-2xl">
             <Label htmlFor="foodInput" className="p-2 text-2xl font-bold text-highlight">Meal input</Label>
             <Input
+                ref={inputElement}
                 className="mb-2"
                 {...isLoading ? { placeholder: "Fetching..." } : { placeholder: "Enter food item" }}
                 // onChange={(event) => setFoodString(event.target.value)}
@@ -334,7 +335,7 @@ export default function mealInput() {
                     <Button onClick={commitMeal}>Commit to day</Button>
                     <Select>
                         <SelectTrigger className="w-auto">
-                            <SelectValue placeholder="Meal" />
+                            <SelectValue ref={mealSelect} placeholder="Meal" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="meal">Breakfast</SelectItem>
