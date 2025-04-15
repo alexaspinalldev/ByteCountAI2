@@ -1,7 +1,7 @@
 "use client";
 
 // Imports
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, use } from "react";
 import { z } from "zod";
 
 import Spinner from "../common/ui/spinner";
@@ -243,11 +243,11 @@ export default function mealInput() {
 
     // * Set the height of the scroll area on window resize or mount
     const [scrollAreaHeight, setScrollAreaHeight] = useState(0);
+    const scrollAreaContainer = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
         const updateHeight = () => {
-            const container = document.getElementById("scrollAreaContainer");
-            if (container) {
-                const newHeight = container.clientHeight;
+            if (scrollAreaContainer) {
+                const newHeight = scrollAreaContainer.current!.clientHeight;
                 setScrollAreaHeight(newHeight); // Update state with the new height
             }
         };
@@ -295,7 +295,7 @@ export default function mealInput() {
             <div className="flex gap-0">
                 <Button className="mb-2 grow" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : <>Add <Sparkles /></>}</Button>
             </div>
-            <div className="grow" id="scrollAreaContainer">
+            <div className="grow" ref={scrollAreaContainer}>
                 {/* ^Used to explicity set the heght of the ScrollArea */}
                 <ScrollArea id="mealPadUl" className="py-2 bg-gray-100 dark:bg-zinc-900" style={{ height: `${scrollAreaHeight}px` }}>
                     <Table>
