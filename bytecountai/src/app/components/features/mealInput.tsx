@@ -2,7 +2,7 @@
 
 // Imports
 import { useState, useEffect, useCallback, useRef, use } from "react";
-import { z } from "zod";
+import { set, z } from "zod";
 
 import Spinner from "../common/ui/spinner";
 
@@ -40,9 +40,7 @@ type Fooditem = z.infer<typeof Fooditem>;
 
 // * Input component
 export default function mealInput() {
-    const [foodString, setFoodString] = useState("");
     const [mealPad, setMealPad] = useState<Fooditem[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
 
     // * Build the mealPad from local storage
     useEffect(() => {
@@ -65,16 +63,24 @@ export default function mealInput() {
 
     // * Functions
     // * Send an item to the AI to test
-    const inputElement = useRef<HTMLInputElement | null>(null);
+    const [foodString, setFoodString] = useState("");
+    const [lastFoodString, setLastFoodString] = useState("");
+    // const inputElement = useRef<HTMLInputElement | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // TODO: Function to handle any changes to the input field and update the state
+    function inputChange(event: React.ChangeEvent<HTMLInputElement>) {
+        setFoodString(event.target.value);
+    }
+
+
     async function testInput() {
-        if (inputElement.current!.value === "") {
+        if (foodString === "") {
             return;
         }
 
         setIsLoading(true); // Start loading state
-        const inputValue: string = inputElement.current!.value;
-        setFoodString(inputValue);
-        inputElement.current!.value = "";
+        setLastFoodString(foodString); // Store the input value in case of an error
 
         // Fetch the response from the POST function
         let data: unknown;
@@ -84,14 +90,16 @@ export default function mealInput() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ input: inputValue }),
+                body: JSON.stringify({ input: foodString }),
             })
             data = await response.json();
 
         } catch (error) {
             console.error("Error generating content:", error);
             alert(`There was a network error - please try again.`);
-            inputElement.current!.value = foodString;
+            setIsLoading(false); // End loading state
+            setFoodString(lastFoodString); // Set the input field back to the lastFoodString
+            // TODO: Add fallback for manual input
             return;
         }
         finally {
@@ -100,20 +108,20 @@ export default function mealInput() {
             // Check if the response is an error, invalid or empty, or type it accordingly
             const responseAsString: string = JSON.stringify(data);
             if (responseAsString.includes("invalid")) {
-                inputElement.current!.value = "";
+                setFoodString(""); // Clear the input field
                 alert(`The supplied input is not food!`); // A problem with the user being a sicko
                 return;
             }
             if (responseAsString.includes("error") || responseAsString === "") {
                 alert(`There was an undefined network error - please try again.`); // Some other AI call error
-                inputElement.current!.value = foodString;
+                setFoodString(lastFoodString); // Restore the input field
                 return;
             }
             // Validate the response type with Zod
             if (!Fooditem.safeParse(data).success) {
                 console.error("Invalid response format:", data);
                 alert(`There was an AI error - please contact the admin.`); // A problem with the prompt
-                inputElement.current!.value = foodString;
+                setFoodString(lastFoodString); // Restore the input field
                 return;
             }
 
@@ -122,7 +130,7 @@ export default function mealInput() {
             // Update the mealPad state with the new food item
             const mealPadWithNewItem = [...mealPad, validResponse];
             setMealPadAndSync(mealPadWithNewItem);
-            inputElement.current!.focus();
+            setFoodString(""); // Clear the input field
         }
     };
 
@@ -210,30 +218,34 @@ export default function mealInput() {
     };
 
     // * Post to day of eating/DB
+    const [mealLabel, setMealLabel] = useState("");
     const mealBody = JSON.stringify(mealPad);
     const totalCalories = total;
-    const mealSelect = useRef<HTMLInputElement | null>(null);
-    let label = mealSelect.current?.value;
     const userId = 1; // TODO: Get the user ID from the session
+
+    function mealLabelChange(value: string) {
+        setMealLabel(value);
+    }
+    // TODO: As it stands this is no good - we have a race condition between the mealLabel being set and commitMeal potentially being called
     async function commitMeal() {
-        if (!label) {
-            alert(`Select which meal this was`);
+        if (!mealLabel) {
+            alert(`Select a label for this meal`);
             return;
         }
         try {
-            const response = await fetch("api/db", {
+            const response = await fetch("api/db/postMeal", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ totalCalories, label, mealBody, userId }),
+                body: JSON.stringify({ totalCalories, mealLabel, mealBody, userId }),
             })
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             } else {
                 setMealPadAndSync([]);
                 alert(`Meal saved successfully!`);
-                // TODO: Need to think about optimistically updating the UI too
+                // TODO: Need to think about optimistically updating the UI too - update a context with the new meal
             }
         } catch (error) {
             console.error("Error posting meal:", error);
@@ -258,17 +270,16 @@ export default function mealInput() {
         // Cleanup event listener on unmount
         return () => window.removeEventListener("resize", updateHeight);
     }, []); // Dependency array ensures this effect runs only once
-
-    // TODO: I wonder if there is some circular logic here with the scrollarea resizing the container and the container resizing the scrollarea
+    // TODO: Something else is making the input component taller than it should be
 
     return (
         <section className="flex flex-col w-full h-full p-2 border-gray-400 border-1 rounded-2xl">
             <Label htmlFor="foodInput" className="p-2 text-2xl font-bold text-highlight">Meal input</Label>
             <Input
-                ref={inputElement}
+                onChange={inputChange}
+                value={foodString}
                 className="mb-2"
                 {...isLoading ? { placeholder: "Fetching..." } : { placeholder: "Enter food item" }}
-                // onChange={(event) => setFoodString(event.target.value)}
                 onKeyDown={(event) => {
                     if (event.key === "Enter") {
                         event.preventDefault();
@@ -333,12 +344,12 @@ export default function mealInput() {
             <div className="flex items-center justify-between py-2 mt-auto">
                 <div className="flex gap-2">
                     <Button onClick={commitMeal}>Commit to day</Button>
-                    <Select>
+                    <Select value={mealLabel} onValueChange={(value) => mealLabelChange(value)}  >
                         <SelectTrigger className="w-auto">
-                            <SelectValue ref={mealSelect} placeholder="Meal" />
+                            <SelectValue placeholder="Meal" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="meal">Breakfast</SelectItem>
+                            <SelectItem value="breakfast">Breakfast</SelectItem>
                             <SelectItem value="lunch">Lunch</SelectItem>
                             <SelectItem value="dinner">Dinner</SelectItem>
                             <SelectItem value="other">Other</SelectItem>

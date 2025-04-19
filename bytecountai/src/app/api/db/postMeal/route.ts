@@ -1,15 +1,10 @@
-// Import db and schema here
-import { db, users, meals } from "../../../db/index";
+import { db, meals } from "@/db/index";
 
 // Types from schema
-type UserSchema = typeof users.$inferInsert;
 type MealSchema = typeof meals.$inferInsert;
-
-// ? Default export or one function to handle all request types?
 
 // * Functions
 // * Function to commit a meal to the database
-// TODO: convert to handler
 export async function POST(Req: Request) {
     // Parse the request body
     const { mealBody, totalCalories, label, userId } = await Req.json();
