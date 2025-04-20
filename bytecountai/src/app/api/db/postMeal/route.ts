@@ -7,7 +7,7 @@ type MealSchema = typeof meals.$inferInsert;
 // * Function to commit a meal to the database
 export async function POST(Req: Request) {
     // Parse the request body
-    const { mealBody, totalCalories, label, userId } = await Req.json();
+    const { mealBody, totalCalories, mealLabel, userId } = await Req.json();
     // TODO: Validate the request body with Zod
     // if (!mealBody || !totalCalories || !label) {
     //     return new Response("Invalid request body", { status: 400 });
@@ -16,7 +16,7 @@ export async function POST(Req: Request) {
 
     let meal = {} as MealSchema;
     meal.totalCalories = totalCalories;
-    meal.label = label;
+    meal.label = mealLabel;
     meal.userId = userId; // ! Placeholder for user ID, replace with actual user ID   
     // meal.dateTimeAdded // ! Placeholder for date/time added. The database will handle this automatically but the user might log meals for other days
     meal.mealBody = mealBody;

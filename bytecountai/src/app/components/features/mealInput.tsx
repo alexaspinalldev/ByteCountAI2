@@ -227,11 +227,13 @@ export default function mealInput() {
         setMealLabel(value);
     }
     // TODO: As it stands this is no good - we have a race condition between the mealLabel being set and commitMeal potentially being called
+
     async function commitMeal() {
         if (!mealLabel) {
             alert(`Select a label for this meal`);
             return;
         }
+        console.log(mealLabel)
         try {
             const response = await fetch("api/db/postMeal", {
                 method: "POST",
@@ -349,11 +351,11 @@ export default function mealInput() {
                             <SelectValue placeholder="Meal" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="breakfast">Breakfast</SelectItem>
-                            <SelectItem value="lunch">Lunch</SelectItem>
-                            <SelectItem value="dinner">Dinner</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                            <SelectItem value="snack">Snack</SelectItem>
+                            <SelectItem value="Breakfast">Breakfast</SelectItem>
+                            <SelectItem value="Lunch">Lunch</SelectItem>
+                            <SelectItem value="Dinner">Dinner</SelectItem>
+                            <SelectItem value="Snack">Snack</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
