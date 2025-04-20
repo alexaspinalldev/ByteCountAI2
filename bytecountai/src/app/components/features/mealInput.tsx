@@ -223,11 +223,6 @@ export default function mealInput() {
     const totalCalories = total;
     const userId = 1; // TODO: Get the user ID from the session
 
-    function mealLabelChange(value: string) {
-        setMealLabel(value);
-    }
-    // TODO: As it stands this is no good - we have a race condition between the mealLabel being set and commitMeal potentially being called
-
     async function commitMeal() {
         if (!mealLabel) {
             alert(`Select a label for this meal`);
@@ -346,7 +341,7 @@ export default function mealInput() {
             <div className="flex items-center justify-between py-2 mt-auto">
                 <div className="flex gap-2">
                     <Button onClick={commitMeal}>Commit to day</Button>
-                    <Select value={mealLabel} onValueChange={(value) => mealLabelChange(value)}  >
+                    <Select value={mealLabel} onValueChange={(value) => setMealLabel(value)}  >
                         <SelectTrigger className="w-auto">
                             <SelectValue placeholder="Meal" />
                         </SelectTrigger>
