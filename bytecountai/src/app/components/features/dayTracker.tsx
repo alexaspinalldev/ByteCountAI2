@@ -71,8 +71,8 @@ export default function DayTracker() {
                                 <li key={meal.id} className="flex flex-row justify-between items-center p-2">
                                     <div className="flex flex-col">
                                         <h3 className="text-lg font-semibold">{meal.label}</h3>
-                                        <p className="text-gray-500">{`${meal.mealBody}`}</p>
-                                        {/* // TODO: We'll map over the individual meals here maybe but right now it'll just paste a json string */}
+                                        {/* <p className="text-gray-500">{`${JSON.parse(meal.mealBody).}`}</p> */}
+                                        {/* // TODO: We need to desructure the mealbody */}
                                     </div>
                                     <span className="text-gray-700">{meal.totalCalories} kcal</span>
                                 </li>
