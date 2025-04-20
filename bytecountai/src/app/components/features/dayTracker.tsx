@@ -8,46 +8,50 @@ import { useState, useEffect } from 'react';
 import { meals } from '@/db/index';
 type MealSchema = typeof meals.$inferSelect;
 
-
-
-const [queryDate, setQueryDate] = useState(new Date()); // Initial value is today
-const [mealsByDay, setMealsByDay] = useState<MealSchema[]>([]);
-const [isLoading, setIsLoading] = useState<boolean>(true);
-
-useEffect(() => {
-    const fetchMeals = async () => {
-        try {
-            setIsLoading(true);
-            const response = await fetch('/api/db/getMeals', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    userId: 1, // TODO: Get this from the session
-                    date: queryDate
-                }),
-                cache: 'default',
-            }
-
-            );
-            const data = await response.json();
-            setMealsByDay(JSON.parse(data)); // Parse into an array
-            setIsLoading(false);
-        } catch (error) {
-            setIsLoading(false);
-            console.error('Error fetching meals:', error);
-        }
-    };
-
-    fetchMeals();
-}, [queryDate]); // Fetch meals when the component mounts or when queryDate changes
-
-// TODO: We'll also use optimistic updates so that the UI updates immediately with mealsToday after the user adds a meal
-
-const totalDailyCalories = mealsByDay?.reduce((acc, meal) => acc + meal.totalCalories, 0)
-
 export default function DayTracker() {
+    const [queryDate, setQueryDate] = useState(new Date()); // Initial value is today
+    const [mealsByDay, setMealsByDay] = useState<MealSchema[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        async function fetchMeals() {
+            try {
+                setIsLoading(true);
+                const response = await fetch('/api/db/getMeals', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: 1, // TODO: Get this from the session
+                        date: queryDate
+                    }),
+                    cache: 'default',
+                }
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                if (!response.body) {
+                    console.error('Response body is null');
+                    return;
+                }
+                const data = await response.json();
+                setMealsByDay(data);
+                console.log('Fetched meals:', data);
+                setIsLoading(false);
+            } catch (error) {
+                setIsLoading(false);
+                console.error('Error fetching meals:', error);
+            }
+        };
+        fetchMeals();
+    }, [queryDate]); // Fetch meals when the component mounts or when queryDate changes
+
+    // TODO: We'll also use optimistic updates so that the UI updates immediately with mealsToday after the user adds a meal
+
+    const totalDailyCalories = mealsByDay?.reduce((acc, meal) => acc + meal.totalCalories, 0)
+
     return (
         <section className="flex flex-col p-2 w-full h-full border-1 border-gray-400 rounded-2xl">
             <div className="flex flex-row justify-between items-center p-2">

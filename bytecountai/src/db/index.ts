@@ -10,5 +10,5 @@ config({ path: ".env" }); // Load your environment variables
 const client = postgres(process.env.DATABASE_URL!);
 
 // Initialize Drizzle with the client
-export const db = drizzle(client);
+export const db = drizzle(client, { schema });
 export * from "./schema/schema"; // Export the schema for use in other files
