@@ -4,6 +4,7 @@ import { DatePicker } from "@/app/components/common/ui/datePicker"
 import { Progress } from "@/app/components/common/ui/progress"
 import { Button } from "@/app/components/common/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import MealSkeleton from "../common/ui/mealSkeleton"
 
 import React, { use } from 'react';
 import { useState, useEffect } from 'react';
@@ -23,13 +24,6 @@ export default function DayTracker() {
     const userDailyGoal = 2000; // TODO: Get this from the session
     const userCaloriesConsumed = mealsByDay?.reduce((acc, meal) => acc + meal.totalCalories, 0)
     const userCalorieGoalProgress = Math.min(userCaloriesConsumed / userDailyGoal, 1) * 100;
-
-
-    useEffect(() => {
-        setTimeout(() => {
-            setProgress(userCalorieGoalProgress);
-        }, 100); // Simulate a delay for the progress bar
-    }, [mealsByDay, userDailyGoal]);
 
     useEffect(() => {
         async function fetchMeals() {
@@ -64,8 +58,13 @@ export default function DayTracker() {
         };
         fetchMeals();
     }, [queryDate]); // Fetch meals when the component mounts or when queryDate changes
-
     // TODO: We'll also use optimistic updates so that the UI updates immediately with mealsToday after the user adds a meal
+
+    useEffect(() => {
+        setTimeout(() => {
+            setProgress(userCalorieGoalProgress);
+        }, 100); // Delay the progress update to allow for initial value to animate
+    }, [userDailyGoal, userCalorieGoalProgress]);
 
     function incementDate() {
         const newDate = new Date(queryDate);
@@ -98,8 +97,11 @@ export default function DayTracker() {
                 <Progress value={progress} />
             </div>
             {isLoading ? (
-                <p className="text-gray-500">Loading...</p>) :
-                // Add a skeleton in here when we know what the layout will be
+                <ul>
+                    <MealSkeleton />
+                    <MealSkeleton />
+                    <MealSkeleton />
+                </ul>) :
                 (
                     <div>
                         <ul>
