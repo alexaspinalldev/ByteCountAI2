@@ -1,17 +1,35 @@
 "use client"
 
-import { CalendarDays } from 'lucide-react';
+import { DatePicker } from "@/app/components/common/ui/datePicker"
+import { Progress } from "@/app/components/common/ui/progress"
+import { Button } from "@/app/components/common/ui/button"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
-import React from 'react';
+import React, { use } from 'react';
 import { useState, useEffect } from 'react';
 
 import { meals } from '@/db/index';
-type MealSchema = typeof meals.$inferSelect;
+type MealSchema = Omit<typeof meals.$inferSelect, 'mealBody'> & { mealBody: Fooditem[] };
+import { Fooditem } from './mealInput';
+// TODO: Create a central type file
+
 
 export default function DayTracker() {
     const [queryDate, setQueryDate] = useState(new Date()); // Initial value is today
     const [mealsByDay, setMealsByDay] = useState<MealSchema[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [progress, setProgress] = useState(0);
+
+    const userDailyGoal = 2000; // TODO: Get this from the session
+    const userCaloriesConsumed = mealsByDay?.reduce((acc, meal) => acc + meal.totalCalories, 0)
+    const userCalorieGoalProgress = Math.min(userCaloriesConsumed / userDailyGoal, 1) * 100;
+
+
+    useEffect(() => {
+        setTimeout(() => {
+            setProgress(userCalorieGoalProgress);
+        }, 100); // Simulate a delay for the progress bar
+    }, [mealsByDay, userDailyGoal]);
 
     useEffect(() => {
         async function fetchMeals() {
@@ -38,7 +56,6 @@ export default function DayTracker() {
                 }
                 const data = await response.json();
                 setMealsByDay(data);
-                console.log('Fetched meals:', data);
                 setIsLoading(false);
             } catch (error) {
                 setIsLoading(false);
@@ -50,31 +67,49 @@ export default function DayTracker() {
 
     // TODO: We'll also use optimistic updates so that the UI updates immediately with mealsToday after the user adds a meal
 
-    const totalDailyCalories = mealsByDay?.reduce((acc, meal) => acc + meal.totalCalories, 0)
+    function incementDate() {
+        const newDate = new Date(queryDate);
+        newDate.setDate(newDate.getDate() + 1);
+        setQueryDate(newDate);
+    }
+
+    function decrementDate() {
+        const newDate = new Date(queryDate);
+        newDate.setDate(newDate.getDate() - 1);
+        setQueryDate(newDate);
+    }
 
     return (
         <section className="flex flex-col p-2 w-full h-full border-1 border-gray-400 rounded-2xl">
-            <div className="flex flex-row justify-between items-center p-2">
-                <h2 className="text-xl font-bold">Today</h2>
-                <CalendarDays className="text-highlight" />
-                {/* Day picker which onChange sets setQueryDate */}
+            <h2 className="p-2 text-2xl font-bold text-highlight">Daily progress</h2>
+            <div className="flex flex-col justify-center items-center p-2">
+                <div className="flex flex-row">
+                    <Button variant="outline" className="mx-2" onClick={decrementDate}>
+                        <ChevronLeft />
+                    </Button>
+                    <DatePicker queryDate={queryDate} setQueryDate={setQueryDate} />
+                    <Button variant="outline" className="mx-2" onClick={incementDate}>
+                        <ChevronRight />
+                    </Button>
+                    {/* Day picker which onChange sets setQueryDate */}
+                </div>
+            </div>
+            <div className="p-2">
+                <Progress value={progress} />
             </div>
             {isLoading ? (
                 <p className="text-gray-500">Loading...</p>) :
                 // Add a skeleton in here when we know what the layout will be
                 (
                     <div>
-                        {/* Progress bar with labels */}
-                        {/* Map over meals by day */}
                         <ul>
                             {mealsByDay.map((meal) => (
-                                <li key={meal.id} className="flex flex-row justify-between items-center p-2">
-                                    <div className="flex flex-col">
-                                        <h3 className="text-lg font-semibold">{meal.label}</h3>
-                                        {/* <p className="text-gray-500">{`${JSON.parse(meal.mealBody).}`}</p> */}
-                                        {/* // TODO: We need to desructure the mealbody */}
+                                <li key={meal.id} className="flex flex-col p-2 text-muted-foreground">
+                                    <div className="flex flex-row justify-between items-center">
+                                        <h3 className="text-base font-semibold">{meal.label}</h3>
+                                        <div className="text-muted-foreground">{meal.totalCalories} kcal</div>
                                     </div>
-                                    <span className="text-gray-700">{meal.totalCalories} kcal</span>
+                                    <span className='text-base text-nowrap overflow-hidden'>{`${meal.mealBody.map(item => item.label).join(", ").slice(0, 40)}...`}</span>
                                 </li>
                             ))}
                         </ul>

@@ -36,7 +36,7 @@ const Fooditem = z.object({
     certainty: z.coerce.number(),
 });
 
-type Fooditem = z.infer<typeof Fooditem>;
+export type Fooditem = z.infer<typeof Fooditem>;
 
 // * Input component
 export default function mealInput() {

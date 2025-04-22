@@ -11,9 +11,9 @@
     "prefix": ""
   },
   "aliases": {
-    "components": "@app/components/commmon",
+    "components": "@app/components/common",
     "utils": "@/lib/utils",
-    "ui": "@app/components/commmon/ui",
+    "ui": "@/app/components/common/ui",
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
