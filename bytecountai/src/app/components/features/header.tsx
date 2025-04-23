@@ -18,9 +18,9 @@ export default function Header() {
     return (
         <SidebarCtx.Provider value={[sidebarOpen, setSidebarOpen]}>
             <header>
-                <div className="relative flex items-center justify-end w-full p-4 text-primary">
+                <div className="relative flex items-center justify-end w-full p-3 text-primary">
                     <button className="flex items-center space-x-4">
-                        <CircleUserRound className="w-6 h-6" onClick={() => setSidebarOpen(prev => !prev)} />
+                        <CircleUserRound className="w-8 h-8" onClick={() => setSidebarOpen(prev => !prev)} />
                     </button>
                 </div>
                 <Sidebar />
