@@ -1,7 +1,7 @@
 "use client";
 
 // Imports
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { z } from "zod";
 
 import Spinner from "../common/ui/spinner";
@@ -9,7 +9,7 @@ import Spinner from "../common/ui/spinner";
 import { Input } from "@/app/components/common/ui/input";
 import { Label } from "@/app/components/common/ui/label"
 import { Button } from "@/app/components/common/ui/button"
-import { ScrollArea } from "@/app/components/common/ui/scroll-area"
+import ResizableScrollArea from "@/app/components/common/ui/resizeableScrollArea";
 import {
     Select,
     SelectContent,
@@ -250,28 +250,9 @@ export default function mealInput() {
         }
     };
 
-    // * Set the height of the scroll area on window resize or mount
-    const [scrollAreaHeight, setScrollAreaHeight] = useState(0);
-    const scrollAreaContainer = useRef<HTMLDivElement | null>(null);
-    const scrollArea = useRef<HTMLDivElement | null>(null);
-    useEffect(() => {
-        const updateHeight = () => {
-            const newHeight = scrollAreaContainer?.current!.clientHeight;
-            setScrollAreaHeight(newHeight); // Update state with the new height
-        }
-        updateHeight()
-        // Update height on window resize
-        window.addEventListener("resize", updateHeight);
-        // Cleanup event listener on unmount
-        return () => window.removeEventListener("resize", updateHeight);
-    }, []);
-    // scrollAreaContainer.current.clientHeight = scrollAreaHeight;
-    console.log(scrollAreaHeight)
-    // ! This works better now for initial render but cannot handle window resizing due to how we're inbjecting the height as inline style
-
     return (
         <section className="flex flex-col w-full h-full p-2 md:p-4 border-gray-400 border-1 rounded-2xl">
-            <Label htmlFor="foodInput" className="p-2 mb-3 text-2xl font-bold text-highlight">Meal input</Label>
+            <Label htmlFor="foodInput" className="p-2 mb-1 md:mb-3 text-2xl font-bold text-highlight">Meal input</Label>
             <Input
                 onChange={inputChange}
                 value={foodString}
@@ -303,39 +284,35 @@ export default function mealInput() {
             <div className="py-2 flex">
                 <Button className="grow" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : <>Add <Sparkles /></>}</Button>
             </div>
-            <div className="grow" ref={scrollAreaContainer}>
-                {/* ^Used to explicity set the height of the ScrollArea */}
-                {/* // TODO: Make your expanding scrollarea a component you wrap around children */}
-                <ScrollArea ref={scrollArea} id="mealPadUl" className="py-2 bg-gray-100 dark:bg-zinc-900" style={{ height: `${scrollAreaHeight}px` }}>
-                    <Table>
-                        <TableBody>
-                            {mealPad.map((item, index) => (
-                                <TableRow key={index} className="flex items-center">
-                                    <TableCell onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodName" className="grow">{item.label}</TableCell>
-                                    <TableCell className="flex items-center">
-                                        <div onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodCal">{item.calories}</div>
-                                        <div className="text-sm">&nbsp;kcal</div>
-                                    </TableCell>
-                                    <TableCell className="relative px-0 group">
-                                        <div className="w-[2rem]">
-                                            <div className={item.certainty === -1 ? "hidden" :
-                                                item.certainty <= 0.4 ? "text-red-500" :
-                                                    item.certainty > 0.4 && item.certainty <= 0.7 ? "text-yellow-500" :
-                                                        "text-green-500"}>
-                                                <svg height={32} width={32} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g strokeWidth="0"></g><g strokeLinecap="round" strokeLinejoin="round"></g><g> <path d="M12 9.5C13.3807 9.5 14.5 10.6193 14.5 12C14.5 13.3807 13.3807 14.5 12 14.5C10.6193 14.5 9.5 13.3807 9.5 12C9.5 10.6193 10.6193 9.5 12 9.5Z" fill="currentColor"></path> </g></svg>
-                                            </div>
+            <ResizableScrollArea>
+                <Table>
+                    <TableBody>
+                        {mealPad.map((item, index) => (
+                            <TableRow key={index} className="flex items-center">
+                                <TableCell onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodName" className="grow">{item.label}</TableCell>
+                                <TableCell className="flex items-center">
+                                    <div onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodCal">{item.calories}</div>
+                                    <div className="text-sm">&nbsp;kcal</div>
+                                </TableCell>
+                                <TableCell className="relative px-0 group">
+                                    <div className="w-[2rem]">
+                                        <div className={item.certainty === -1 ? "hidden" :
+                                            item.certainty <= 0.4 ? "text-red-500" :
+                                                item.certainty > 0.4 && item.certainty <= 0.7 ? "text-yellow-500" :
+                                                    "text-green-500"}>
+                                            <svg height={32} width={32} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g strokeWidth="0"></g><g strokeLinecap="round" strokeLinejoin="round"></g><g> <path d="M12 9.5C13.3807 9.5 14.5 10.6193 14.5 12C14.5 13.3807 13.3807 14.5 12 14.5C10.6193 14.5 9.5 13.3807 9.5 12C9.5 10.6193 10.6193 9.5 12 9.5Z" fill="currentColor"></path> </g></svg>
                                         </div>
-                                        {/* Certainty hint/tooltip */}
-                                        <div className="absolute w-[200px] hidden p-1 text-center bg-gray-400 rounded-full text-md top-2 group-hover:block">{item.certainty < 0.4 ? "Adding weight/quantity, brand or preparation method can improve accuracy " : "Certainty: " + item.certainty}</div>
-                                    </TableCell>
-                                    <TableCell><Button size="sm" variant="outline" onClick={() => removeItem(index)}>Remove</Button></TableCell>
-                                </TableRow>
-                            ))
-                            }
-                        </TableBody>
-                    </Table>
-                </ScrollArea >
-            </div>
+                                    </div>
+                                    {/* Certainty hint/tooltip */}
+                                    <div className="absolute w-[200px] hidden p-1 text-center bg-gray-400 rounded-full text-md top-2 group-hover:block">{item.certainty < 0.4 ? "Adding weight/quantity, brand or preparation method can improve accuracy " : "Certainty: " + item.certainty}</div>
+                                </TableCell>
+                                <TableCell><Button size="sm" variant="outline" onClick={() => removeItem(index)}>Remove</Button></TableCell>
+                            </TableRow>
+                        ))
+                        }
+                    </TableBody>
+                </Table>
+            </ResizableScrollArea>
             <div className="flex justify-end py-2">
                 <Button className="" variant="outline" onClick={clearMealPad}>Clear all</Button>
             </div>
