@@ -7,14 +7,15 @@ export default function Sidebar() {
     const [sidebarOpen, setSidebarOpen] = useSidebarCtx();
     return (
         <div>
-            <div className={`${sidebarOpen ? 'block' : 'hidden'} absolute w-full h-full z-49 bg-zinc-950 opacity-45`} onClick={() => setSidebarOpen(false)}></div>
+            <div className={`${sidebarOpen ? 'fixed top-0' : 'hidden'} absolute w-full h-full z-49 bg-zinc-950 opacity-45`} onClick={() => setSidebarOpen(false)}></div>
             <aside className={`${sidebarOpen ? '' : 'translate-x-full'} overflow-y-auto transition-transform duration-300 ease-in-out transform fixed top-0 right-0 z-50 ml-auto h-full shadow-lg dark:shadow-zinc-900 bg-background text-foreground w-4/5 max-w-[400px] rounded-l-2xl border-1 border-gray-400 border-r-0`}>
                 <div className="p-4">
                     <div className='flex items-center justify-between'>
                         <h1 className="text-2xl font-semibold">ByteCount</h1>
-                        <button onClick={() => setSidebarOpen(false)}>
+                        <button className='text-primary' onClick={() => setSidebarOpen(false)}>
                             <ArrowRightFromLine ></ArrowRightFromLine>
                         </button>
+                        {/* // TODO: create an unstyled Button variant for this and all other icons */}
                     </div>
 
                     <ul className="mt-4">

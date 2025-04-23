@@ -21,7 +21,7 @@ export function DatePicker({ queryDate, setQueryDate }: { queryDate: Date, setQu
                 <Button
                     variant={"outline"}
                     className={cn(
-                        "w-[280px] justify-center text-center font-normal",
+                        "min-w-fit grow justify-center text-center font-normal",
                         !queryDate && "text-muted-foreground"
                     )}
                 >

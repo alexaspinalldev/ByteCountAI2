@@ -85,8 +85,8 @@ export default function DayTracker() {
                 <h2 className="p-2 text-2xl font-bold text-highlight">Daily progress</h2>
                 <ChartLine className="w-8 h-8 text-primary mr-4" />
             </div>
-            <div className="flex flex-col justify-center items-center p-2">
-                <div className="flex flex-row">
+            <div className="flex flex-col justify-center items-center py-2">
+                <div className="flex flex-row w-full justify-between items-center">
                     <Button variant="outline" className="mx-2" onClick={decrementDate}>
                         <ChevronLeft />
                     </Button>

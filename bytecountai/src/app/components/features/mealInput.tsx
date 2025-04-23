@@ -76,6 +76,7 @@ export default function mealInput() {
 
     async function testInput() {
         if (foodString === "") {
+            alert(`Enter an item of food or drink to get the calories`);
             return;
         }
 
@@ -224,11 +225,15 @@ export default function mealInput() {
     const userId = 1; // TODO: Get the user ID from the session
 
     async function commitMeal() {
+        if (mealPad.length === 0) {
+            alert(`No items to save`);
+            return;
+            // TODO: Disable the button of there's no mealPad items
+        }
         if (!mealLabel) {
             alert(`Select a label for this meal`);
             return;
         }
-        console.log(mealLabel)
         try {
             const response = await fetch("api/db/postMeal", {
                 method: "POST",
