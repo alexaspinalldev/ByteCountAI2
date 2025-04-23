@@ -1,6 +1,6 @@
 import { ScrollArea } from "./scroll-area";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 export default function ResizableScrollArea({ children }: { children: React.ReactNode }) {
     const scrollAreaContainer = useRef<HTMLDivElement | null>(null);
@@ -14,6 +14,7 @@ export default function ResizableScrollArea({ children }: { children: React.Reac
             }
         }
         updateHeight()
+
         // Update height on window resize - initialise the height back to 0 to allow for the parent to flex smaller than the child
         window.addEventListener("resize", () => {
             if (scrollAreaContainer.current) {
