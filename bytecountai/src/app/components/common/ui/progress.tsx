@@ -20,7 +20,7 @@ function Progress({ className, value, children, ...props }: ProgressProps & { ch
       )}
       {...props}
     >
-      <div className="absolute w-full h-full top-0 left-0 z-5 flex justify-center items-center text-sm">{children}</div>
+      <div className={`${value! >= 50 ? "text-black" : "text-white"} absolute w-full h-full top-0 left-0 z-5 flex justify-center items-center text-sm`}>{children}</div>
       <ProgressPrimitive.Indicator
         data-slot="progress-indicator"
         className="bg-primary h-full w-full flex-1 transition-all"
