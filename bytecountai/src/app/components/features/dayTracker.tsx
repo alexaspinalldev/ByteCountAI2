@@ -1,6 +1,7 @@
 "use client"
 
 import { DatePicker } from "@/app/components/common/ui/datePicker"
+import { Label } from "@/app/components/common/ui/label"
 import { Progress } from "@/app/components/common/ui/progress"
 import { Button } from "@/app/components/common/ui/button"
 import ResizableScrollArea from "@/app/components/common/ui/resizeableScrollArea"
@@ -8,13 +9,9 @@ import { ChevronLeft, ChevronRight, ChartLine } from "lucide-react"
 import MealSkeleton from "../common/ui/mealSkeleton"
 
 import React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
-import { meals } from '@/db/index';
-type MealSchema = Omit<typeof meals.$inferSelect, 'mealBody'> & { mealBody: Fooditem[] };
-import { Fooditem } from './mealInput';
-// TODO: Create a central type file
-
+import { MealSchema } from '@/types';
 
 export default function DayTracker() {
     const [queryDate, setQueryDate] = useState(new Date()); // Initial value is today
@@ -100,7 +97,9 @@ export default function DayTracker() {
                 </div>
             </div>
             <div className="p-2">
-                <Progress value={progress} />
+                <Progress value={progress} className="h-7">
+                    {`${userCaloriesConsumed}/${userDailyGoal}`}
+                </Progress>
             </div>
             <ResizableScrollArea>
                 {isLoading ? (

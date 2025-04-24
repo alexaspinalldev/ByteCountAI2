@@ -1,7 +1,7 @@
 import { db, meals } from "@/db/index";
 
 // import { z } from "zod";
-import { mealSchema } from "@/types";
+import { MealSchema } from "@/types";
 
 // * Functions
 // * Function to commit a meal to the database
@@ -15,7 +15,7 @@ export async function POST(Req: Request) {
     }
     // TODO: Check if the user exists?
 
-    let meal = {} as mealSchema;
+    let meal = {} as MealSchema;
     meal.totalCalories = totalCalories;
     meal.label = mealLabel;
     meal.userId = userId; // ! Placeholder for user ID, replace with actual user ID   
