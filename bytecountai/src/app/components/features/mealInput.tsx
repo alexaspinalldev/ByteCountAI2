@@ -2,10 +2,12 @@
 
 // Imports
 import { useState, useEffect, useCallback } from "react";
-import { number, z } from "zod";
+
+import { z } from "zod";
+import { Fooditem } from "@/types";
+type Fooditem = z.infer<typeof Fooditem>;
 
 import Spinner from "../common/ui/spinner";
-
 import { Input } from "@/app/components/common/ui/input";
 import { Label } from "@/app/components/common/ui/label"
 import { Button } from "@/app/components/common/ui/button"
@@ -17,7 +19,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/app/components/common/ui/select"
-
 import {
     Table,
     TableBody,
@@ -28,15 +29,6 @@ import {
 import { Sparkles } from 'lucide-react';
 
 // ----------------------------------------------------------------
-
-// Zod schema for Fooditem
-const Fooditem = z.object({
-    label: z.string(),
-    calories: z.coerce.number(),
-    certainty: z.coerce.number(),
-});
-
-export type Fooditem = z.infer<typeof Fooditem>;
 
 // * Input component
 export default function mealInput() {
@@ -279,7 +271,7 @@ export default function mealInput() {
             }
         } catch (error) {
             console.error("Error posting meal:", error);
-            alert(`There was an error saving the meal. Please try again.`);
+            alert(`There was an error saving the meal. Please try again later.`);
         }
     };
 

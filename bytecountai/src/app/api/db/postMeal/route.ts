@@ -1,20 +1,21 @@
 import { db, meals } from "@/db/index";
 
-// Types from schema
-type MealSchema = typeof meals.$inferInsert;
+// import { z } from "zod";
+import { mealSchema } from "@/types";
 
 // * Functions
 // * Function to commit a meal to the database
 export async function POST(Req: Request) {
     // Parse the request body
     const { mealBody, totalCalories, mealLabel, userId } = await Req.json();
-    // TODO: Validate the request body with Zod
-    // if (!mealBody || !totalCalories || !label) {
-    //     return new Response("Invalid request body", { status: 400 });
-    // }
+
+    if (!mealBody || !totalCalories || !mealLabel || !userId) {
+        console.error("Invalid request body:", { mealBody, totalCalories, mealLabel, userId });
+        return new Response("Invalid request body", { status: 400 });
+    }
     // TODO: Check if the user exists?
 
-    let meal = {} as MealSchema;
+    let meal = {} as mealSchema;
     meal.totalCalories = totalCalories;
     meal.label = mealLabel;
     meal.userId = userId; // ! Placeholder for user ID, replace with actual user ID   

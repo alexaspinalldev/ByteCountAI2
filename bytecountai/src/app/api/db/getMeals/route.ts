@@ -1,5 +1,9 @@
-import { db, meals } from "@/db/index";
+import { db } from "@/db/index";
+import { z } from "zod";
+import { meals } from "@/types"
 import { eq, and, sql } from "drizzle-orm";
+
+
 
 // * Function to get all a day's meals for a user
 export async function POST(Req: Request) {

@@ -1,7 +1,13 @@
 import { GoogleGenAI } from "@google/genai";
 
+import { z } from "zod";
+import { Fooditem } from "@/types";
+type Fooditem = z.infer<typeof Fooditem>;
+// TODO: safeParse using zod or does it need to be that complex?
+
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const ai = new GoogleGenAI({ apiKey: GOOGLE_API_KEY });
+
 
 export async function POST(request: Request) {
     if (request.method !== "POST") {
