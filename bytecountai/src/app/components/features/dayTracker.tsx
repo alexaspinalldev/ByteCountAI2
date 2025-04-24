@@ -112,12 +112,17 @@ export default function DayTracker() {
                         (
                             <ul>
                                 {mealsByDay.map((meal) => (
-                                    <li key={meal.id} className="flex flex-col p-2 text-muted-foreground">
-                                        <div className="flex flex-row justify-between items-center">
-                                            <h3 className="text-base font-semibold">{meal.label}</h3>
+                                    <li key={meal.id} className="flex flex-col p-2 text-muted-foreground w-full max-w-full">
+                                        <div className="flex flex-row justify-between items-center w-full text-sm">
+                                            <h3 className=" font-semibold">{meal.label}</h3>
                                             <div className="text-muted-foreground">{meal.totalCalories} kcal</div>
                                         </div>
-                                        <span className='text-base text-nowrap overflow-hidden'>{`${meal.mealBody.map(item => item.label).join(", ").slice(0, 40)}...`}</span>
+                                        <div className="text-sm max-w-full w-full" style={{
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 1,
+                                            WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden'
+                                        }}>{meal.mealBody.map(item => item.label).join(", ")}</div>
                                     </li>
                                 ))}
                             </ul>
