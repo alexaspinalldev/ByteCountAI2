@@ -2,7 +2,7 @@
 
 // Imports
 import { useState, useEffect, useCallback } from "react";
-import { z } from "zod";
+import { number, z } from "zod";
 
 import Spinner from "../common/ui/spinner";
 
@@ -93,7 +93,7 @@ export default function mealInput() {
         setLastFoodString(foodString); // Store the input value in case of an error
 
         // Fetch the response from the POST function
-        let data: unknown;
+        let data: any;
         try {
             const response = await fetch("api/ai", {
                 method: "POST",
@@ -102,14 +102,16 @@ export default function mealInput() {
                 },
                 body: JSON.stringify({ input: foodString }),
             })
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             data = await response.json();
 
         } catch (error) {
-            console.error("Error generating content:", error);
-            alert(`There was a network error - please try again.`);
+            console.error("Error generating response:", error);
             setIsLoading(false); // End loading state
-            setFoodString(lastFoodString); // Set the input field back to the lastFoodString
-            // TODO: Add fallback for manual input
+            foodAddFallback()
+            setFoodString(lastFoodString)
             return;
         }
         finally {
@@ -122,11 +124,7 @@ export default function mealInput() {
                 alert(`The supplied input is not food!`); // A problem with the user being a sicko
                 return;
             }
-            if (responseAsString.includes("error") || responseAsString === "") {
-                alert(`There was an undefined network error - please try again.`); // Some other AI call error
-                setFoodString(lastFoodString); // Restore the input field
-                return;
-            }
+
             // Validate the response type with Zod
             if (!Fooditem.safeParse(data).success) {
                 console.error("Invalid response format:", data);
@@ -143,6 +141,27 @@ export default function mealInput() {
             setFoodString(""); // Clear the input field
         }
     };
+
+    // * Fallback for when the API call fails
+    async function foodAddFallback() {
+        if (confirm(`There was a network error - add food manually?`)) {
+            let manualCalories: string | null;
+            do {
+                manualCalories = prompt(`Calories in ${foodString}:`, "0");
+                if (manualCalories === null) {
+                    return; // User canceled the prompt
+                }
+            } while (isNaN(Number(manualCalories)) || manualCalories.trim() === "");
+            const manualFoodItem: Fooditem = {
+                label: foodString,
+                calories: manualCalories ? parseInt(manualCalories) : 0,
+                certainty: -1,
+            }
+            const mealPadWithNewItem = [...mealPad, manualFoodItem];
+            setMealPadAndSync(mealPadWithNewItem);
+            setFoodString(""); // Clear the input field
+        }
+    }
 
     // * Edit item in the mealPad
     // Make the item editable on click
@@ -305,7 +324,7 @@ export default function mealInput() {
                             <TableRow key={index} className="flex items-center">
                                 <TableCell onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodName" className="grow">{item.label}</TableCell>
                                 <TableCell className="flex items-center">
-                                    <div onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodCal">{item.calories}</div>
+                                    <div className="min-w-6 min-h-5" onClick={(event) => editItem(event, index)} plaintext-only="true" id="foodCal">{item.calories}</div>
                                     <div className="text-sm">&nbsp;kcal</div>
                                 </TableCell>
                                 <TableCell className="relative px-0 group">
