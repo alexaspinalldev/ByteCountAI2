@@ -1,5 +1,6 @@
 "use client";
 import { ArrowRightFromLine } from 'lucide-react';
+import { Button } from '../common/ui/button';
 
 import { useSidebarCtx } from '@/app/components/features/header';
 
@@ -12,10 +13,9 @@ export default function Sidebar() {
                 <div className="p-4">
                     <div className='flex items-center justify-between'>
                         <h1 className="text-2xl font-semibold">ByteCount</h1>
-                        <button className='text-primary' onClick={() => setSidebarOpen(false)}>
-                            <ArrowRightFromLine ></ArrowRightFromLine>
-                        </button>
-                        {/* // TODO: create an unstyled Button variant for this and all other icons */}
+                        <Button className='text-primary' size="basic" variant="ghost" onClick={() => setSidebarOpen(false)}>
+                            <ArrowRightFromLine className='size-full' />
+                        </Button>
                     </div>
 
                     <ul className="mt-4">

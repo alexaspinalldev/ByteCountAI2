@@ -83,7 +83,10 @@ export default function DayTracker() {
         <section className="flex flex-col p-2 md:p-4 w-full h-full border-1 border-gray-400 rounded-2xl">
             <div className="flex justify-between items-center">
                 <h2 className="p-2 text-2xl font-bold text-highlight">Daily progress</h2>
-                <ChartLine className="w-8 h-8 text-primary mr-4" />
+                <Button variant="ghost" size="basic" className="text-primary mr-4">
+                    {/* // TODO: Launch chart onClick */}
+                    <ChartLine className="size-full" />
+                </Button>
             </div>
             <div className="flex flex-col justify-center items-center py-2">
                 <div className="flex flex-row w-full justify-between items-center">
