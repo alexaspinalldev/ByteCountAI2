@@ -79,7 +79,7 @@ export default function DayTracker() {
     return (
         <section className="flex flex-col p-2 md:p-4 w-full h-full border-1 border-gray-400 rounded-2xl">
             <div className="flex justify-between items-center">
-                <h2 className="p-2 text-2xl font-bold text-highlight">Daily progress</h2>
+                <h2 className="px-2 text-xl md:py-2 md:text-2xl font-bold text-highlight">Daily progress</h2>
                 <Button variant="ghost" size="basic" className="text-primary mr-4">
                     {/* // TODO: Launch chart onClick */}
                     <ChartLine className="size-full" />
@@ -95,11 +95,6 @@ export default function DayTracker() {
                         <ChevronRight />
                     </Button>
                 </div>
-            </div>
-            <div className="p-2">
-                <Progress value={progress} className="h-7">
-                    {`${userCaloriesConsumed}/${userDailyGoal}`}
-                </Progress>
             </div>
             <ResizableScrollArea>
                 {isLoading ? (
@@ -129,6 +124,11 @@ export default function DayTracker() {
                         )
                 }
             </ResizableScrollArea>
+            <div className="p-2">
+                <Progress value={progress} className="h-7">
+                    {`${userCaloriesConsumed}/${userDailyGoal}`}
+                </Progress>
+            </div>
         </section >
     )
 }

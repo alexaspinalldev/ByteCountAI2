@@ -277,7 +277,21 @@ export default function mealInput() {
 
     return (
         <section className="flex flex-col w-full h-full p-2 md:p-4 border-gray-400 border-1 rounded-2xl">
-            <Label htmlFor="foodInput" className="p-2 text-2xl font-bold text-highlight">Meal input</Label>
+            <div className="flex justify-between">
+                <Label htmlFor="foodInput" className="px-2 text-xl md:py-2 md:text-2xl font-bold text-highlight">Meal input</Label>
+                <Select value={mealLabel} onValueChange={(value) => setMealLabel(value)}  >
+                    <SelectTrigger className="w-[120px]">
+                        <SelectValue placeholder="Meal name" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="Breakfast">Breakfast</SelectItem>
+                        <SelectItem value="Lunch">Lunch</SelectItem>
+                        <SelectItem value="Dinner">Dinner</SelectItem>
+                        <SelectItem value="Snack">Snack</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
             <div className="py-2">
                 <Input
                     onChange={inputChange}
@@ -305,8 +319,9 @@ export default function mealInput() {
                     type="text"
                     id="foodInput"
                     disabled={isLoading}
-                /></div>
-            <div className="py-2 flex">
+                />
+            </div>
+            <div className="pb-2 md:py-2 flex">
                 <Button className="grow" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : <>Add <Sparkles /></>}</Button>
             </div>
             <ResizableScrollArea>
@@ -338,24 +353,12 @@ export default function mealInput() {
                     </TableBody>
                 </Table>
             </ResizableScrollArea>
-            <div className="flex justify-end py-2">
-                <Button className="" variant="outline" onClick={clearMealPad}>Clear all</Button>
+            <div className="flex justify-end md:py-2">
+                <Button variant="outline" onClick={clearMealPad}>Clear all</Button>
             </div>
             <div className="flex items-center justify-between pt-2 mt-auto">
                 <div className="flex gap-2">
                     <Button disabled={disableMealCommit} onClick={commitMeal}>Commit to day</Button>
-                    <Select value={mealLabel} onValueChange={(value) => setMealLabel(value)}  >
-                        <SelectTrigger className="w-[120px]">
-                            <SelectValue placeholder="Meal" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Breakfast">Breakfast</SelectItem>
-                            <SelectItem value="Lunch">Lunch</SelectItem>
-                            <SelectItem value="Dinner">Dinner</SelectItem>
-                            <SelectItem value="Snack">Snack</SelectItem>
-                            <SelectItem value="Other">Other</SelectItem>
-                        </SelectContent>
-                    </Select>
                 </div>
                 <div>Total: {total}</div>
             </div>

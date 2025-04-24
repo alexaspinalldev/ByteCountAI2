@@ -19,7 +19,7 @@ export default function Header() {
     return (
         <SidebarCtx.Provider value={[sidebarOpen, setSidebarOpen]}>
             <header>
-                <div className="relative flex items-center justify-end w-full px-3 py-2 text-primary">
+                <div className="relative flex items-center justify-end w-full px-3 py-1 md:py-2 text-primary">
                     <Button className="flex items-center space-x-4" variant="ghost" size="basic" onClick={() => setSidebarOpen(prev => !prev)} >
                         <CircleUserRound className='size-full' />
                     </Button>
