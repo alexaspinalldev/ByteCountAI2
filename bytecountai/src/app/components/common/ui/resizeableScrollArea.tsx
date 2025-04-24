@@ -31,7 +31,7 @@ export default function ResizableScrollArea({ children }: { children: React.Reac
     return (
         <div className="grow" ref={scrollAreaContainer}>
             {/* ^Used to explicity set the height of the ScrollArea */}
-            <ScrollArea ref={scrollArea} id="mealPadUl" className="py-2 bg-gray-100 dark:bg-zinc-900">
+            <ScrollArea ref={scrollArea} id="mealPadUl" className="py-2 bg-zinc-900 rounded-lg">
                 {children}
             </ScrollArea >
         </div>

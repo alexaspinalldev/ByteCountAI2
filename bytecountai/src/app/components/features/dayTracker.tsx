@@ -81,7 +81,7 @@ export default function DayTracker() {
 
     return (
         <section className="flex flex-col p-2 md:p-4 w-full h-full border-1 border-gray-400 rounded-2xl">
-            <div className="flex justify-between items-center mb-1 md:mb-3">
+            <div className="flex justify-between items-center">
                 <h2 className="p-2 text-2xl font-bold text-highlight">Daily progress</h2>
                 <ChartLine className="w-8 h-8 text-primary mr-4" />
             </div>

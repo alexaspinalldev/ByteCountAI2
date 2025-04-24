@@ -41,17 +41,29 @@ export type Fooditem = z.infer<typeof Fooditem>;
 // * Input component
 export default function mealInput() {
     const [mealPad, setMealPad] = useState<Fooditem[]>([]);
+    const [disableMealCommit, setDisableMealCommit] = useState(false);
 
     // * Build the mealPad from local storage
     useEffect(() => {
         const mealPad = JSON.parse(localStorage.getItem("mealPad") as string);
         if (mealPad === null) {
             setMealPad([]);
+            setDisableMealCommit(false);
         } else {
             setMealPad(mealPad);
+            setDisableMealCommit(true);
         }
     }, []);
-    // [] is the dependency array. If you want to run the effect only once, you can pass an empty array [] as the second argument.
+
+    // * Disable the commit button if the mealPad is empty
+    useEffect(() => {
+        if (mealPad.length === 0) {
+            setDisableMealCommit(true);
+        }
+        else {
+            setDisableMealCommit(false);
+        }
+    }, [mealPad]);
 
     // * Calculate total calories on render
     const [total, setTotal] = useState(0);
@@ -59,16 +71,13 @@ export default function mealInput() {
         const calculatedTotal = mealPad.reduce((acc, item) => acc + item.calories, 0);
         setTotal(calculatedTotal);
     }, [mealPad]);
-    // Here the dependency array is mealPad, so the effect will run whenever mealPad changes.
 
     // * Functions
     // * Send an item to the AI to test
     const [foodString, setFoodString] = useState("");
     const [lastFoodString, setLastFoodString] = useState("");
-    // const inputElement = useRef<HTMLInputElement | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // TODO: Function to handle any changes to the input field and update the state
     function inputChange(event: React.ChangeEvent<HTMLInputElement>) {
         setFoodString(event.target.value);
     }
@@ -227,8 +236,8 @@ export default function mealInput() {
     async function commitMeal() {
         if (mealPad.length === 0) {
             alert(`No items to save`);
+            setDisableMealCommit(false);
             return;
-            // TODO: Disable the button of there's no mealPad items
         }
         if (!mealLabel) {
             alert(`Select a label for this meal`);
@@ -257,35 +266,35 @@ export default function mealInput() {
 
     return (
         <section className="flex flex-col w-full h-full p-2 md:p-4 border-gray-400 border-1 rounded-2xl">
-            <Label htmlFor="foodInput" className="p-2 mb-1 md:mb-3 text-2xl font-bold text-highlight">Meal input</Label>
-            <Input
-                onChange={inputChange}
-                value={foodString}
-                className="mb-2"
-                {...isLoading ? { placeholder: "Fetching..." } : { placeholder: "Enter food item" }}
-                onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                        event.preventDefault();
-                        testInput();
-                    }
-                }}
-                // onBlur={(event) => {
-                //     const inputElement = event.target as HTMLInputElement;
-                //     if (inputElement.value === "") {
-                //         inputElement.value = foodString;
-                //         inputElement.placeholder = "Enter food item";
-                //     }
-                // }}
-                autoComplete="on"
-                autoCorrect="on"
-                autoCapitalize="sentences"
-                spellCheck="true"
-                autoFocus
-                autoSave="on"
-                type="text"
-                id="foodInput"
-                disabled={isLoading}
-            />
+            <Label htmlFor="foodInput" className="p-2 text-2xl font-bold text-highlight">Meal input</Label>
+            <div className="py-2">
+                <Input
+                    onChange={inputChange}
+                    value={foodString}
+                    {...isLoading ? { placeholder: "Fetching..." } : { placeholder: "Enter food item" }}
+                    onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                            event.preventDefault();
+                            testInput();
+                        }
+                    }}
+                    // onBlur={(event) => {
+                    //     const inputElement = event.target as HTMLInputElement;
+                    //     if (inputElement.value === "") {
+                    //         inputElement.value = foodString;
+                    //         inputElement.placeholder = "Enter food item";
+                    //     }
+                    // }}
+                    autoComplete="on"
+                    autoCorrect="on"
+                    autoCapitalize="sentences"
+                    spellCheck="true"
+                    autoFocus
+                    autoSave="on"
+                    type="text"
+                    id="foodInput"
+                    disabled={isLoading}
+                /></div>
             <div className="py-2 flex">
                 <Button className="grow" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : <>Add <Sparkles /></>}</Button>
             </div>
@@ -323,7 +332,7 @@ export default function mealInput() {
             </div>
             <div className="flex items-center justify-between pt-2 mt-auto">
                 <div className="flex gap-2">
-                    <Button onClick={commitMeal}>Commit to day</Button>
+                    <Button disabled={disableMealCommit} onClick={commitMeal}>Commit to day</Button>
                     <Select value={mealLabel} onValueChange={(value) => setMealLabel(value)}  >
                         <SelectTrigger className="w-[120px]">
                             <SelectValue placeholder="Meal" />
