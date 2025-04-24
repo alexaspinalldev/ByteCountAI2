@@ -27,6 +27,7 @@ import {
 } from "@/app/components/common/ui/table"
 
 import { Sparkles } from 'lucide-react';
+import { BookOpen } from "lucide-react";
 
 // ----------------------------------------------------------------
 
@@ -251,7 +252,7 @@ export default function mealInput() {
             return;
         }
         if (!mealLabel) {
-            alert(`Select a label for this meal`);
+            alert(`Select a name for this meal`);
             return;
         }
         try {
@@ -279,20 +280,8 @@ export default function mealInput() {
         <section className="flex flex-col w-full h-full p-2 md:p-4 border-gray-400 border-1 rounded-2xl">
             <div className="flex justify-between">
                 <Label htmlFor="foodInput" className="px-2 text-xl md:py-2 md:text-2xl font-bold text-highlight">Meal input</Label>
-                <Select value={mealLabel} onValueChange={(value) => setMealLabel(value)}  >
-                    <SelectTrigger className="w-[120px]">
-                        <SelectValue placeholder="Meal name" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="Breakfast">Breakfast</SelectItem>
-                        <SelectItem value="Lunch">Lunch</SelectItem>
-                        <SelectItem value="Dinner">Dinner</SelectItem>
-                        <SelectItem value="Snack">Snack</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
-                    </SelectContent>
-                </Select>
             </div>
-            <div className="py-2">
+            <div className="py-2 flex items-center gap-3">
                 <Input
                     onChange={inputChange}
                     value={foodString}
@@ -320,9 +309,10 @@ export default function mealInput() {
                     id="foodInput"
                     disabled={isLoading}
                 />
-            </div>
-            <div className="pb-2 md:py-2 flex">
                 <Button className="grow" onClick={testInput} disabled={isLoading}>{isLoading ? <Spinner /> : <>Add <Sparkles /></>}</Button>
+                <Button disabled={isLoading}>
+                    <BookOpen className="size-full" />
+                </Button>
             </div>
             <ResizableScrollArea>
                 <Table>
@@ -353,7 +343,19 @@ export default function mealInput() {
                     </TableBody>
                 </Table>
             </ResizableScrollArea>
-            <div className="flex justify-end md:py-2">
+            <div className="flex justify-between md:py-2">
+                <Select value={mealLabel} onValueChange={(value) => setMealLabel(value)}  >
+                    <SelectTrigger className="w-[120px]">
+                        <SelectValue placeholder="Meal name" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="Breakfast">Breakfast</SelectItem>
+                        <SelectItem value="Lunch">Lunch</SelectItem>
+                        <SelectItem value="Dinner">Dinner</SelectItem>
+                        <SelectItem value="Snack">Snack</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                </Select>
                 <Button variant="outline" onClick={clearMealPad}>Clear all</Button>
             </div>
             <div className="flex items-center justify-between pt-2 mt-auto">
