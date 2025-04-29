@@ -25,7 +25,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <title>{String(metadata.title)}</title>
       </head>
       <body
-        className={"h-lvh dark"}
+        className={"h-lvh dark overflow-hidden"}
       >
         {children}
       </body>
